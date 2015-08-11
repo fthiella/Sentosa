@@ -1,2 +1,4 @@
 # data contains generated mobj files, sessions, chache, and .db files
 data/
+# don't sync log files
+logs/
