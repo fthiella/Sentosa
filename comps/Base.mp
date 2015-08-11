@@ -3,9 +3,17 @@ use Sentosa::UserSessions;
 
 has 'username';
 has 'password';
+has 'logout';
 has 'authenticated_user';
 
 method wrap() {
+
+  if (defined $.logout) {
+      $.authenticated_user(undef);
+      $m->session->{auth_id} = undef;
+      $m->redirect('/');
+  };
+
   if ($.username || $.password) {
     $.authenticated_user( Sentosa::Users::auth_user( $.username, $.password ) );
 

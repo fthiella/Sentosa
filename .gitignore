@@ -1,3 +1,2 @@
-data/sentosa.db
-*.dat
-*.mobj
+# data contains generated mobj files, sessions, chache, and .db files
+data/

@@ -12,7 +12,7 @@ has 'title';
     </head>
     <body>
       <div>
-        Logged in as user: <% $.authenticated_user || 'Guest' %>
+        Logged in as user: <% Sentosa::Users::get_userinfo($.authenticated_user) || 'Guest' %>
       </div>
       <div>
         <form method="post">
