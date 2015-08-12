@@ -44,7 +44,7 @@ create table if not exists af_groups (
 
 insert into af_groups (id, groupname) values
 (1, 'administrators'),
-(2, 'flowers');
+(2, 'gardens');
 
 -- af_usergroups: Users to Groups
 create table if not exists af_usergroups (
@@ -69,7 +69,7 @@ create table if not exists af_apps (
 
 insert into af_apps (id, url, details) values
 (1, 'admin', 'Sentosa Management'),
-(2, 'flowers', 'Flowers and Gardens');
+(2, 'gardens', 'Gardens and Flowers');
 
 -- af_appgroups: Applications to Groups
 create table if not exists af_appgroups (
