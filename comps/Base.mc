@@ -108,7 +108,7 @@ has 'title';
 <%method dropdown_user ($user) >
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                        <i class="fa fa-user fa-fw"></i> <% $user %> <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
                         <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
@@ -129,17 +129,19 @@ has 'title';
 % foreach my $item (@$items) {
                         <li>
                             <a href="<% $item->{url} %>"><i class="fa <% $item->{type} %> fa-fw"></i> <% $item->{title} %>
-% # if more levels...
+%   if (defined $item->{second}) {
                             <span class="fa arrow"></span>
+%   }
                             </a>
+%   if (defined $item->{second}) {
                             <ul class="nav nav-second-level">
+%     foreach my $second (@{$item->{second}}) {
                                 <li>
-                                    <a href="flot.html">Flot Charts</a>
+                                    <a href="<% $second->{url} %>"><% $second->{title} %></a>
                                 </li>
-                                <li>
-                                    <a href="morris.html">Morris.js Charts</a>
-                                </li>
+%     }
                             </ul>
+%   }
                         </li>
 % }
                     </ul>
@@ -221,7 +223,7 @@ has 'title';
                       {type=>'fa-upload', notification=>'Server Rebooted', when=>'15 minutes ago'},
                     ]) %>
                 
-                <% $.dropdown_user() %>
+                <% $.dropdown_user( Sentosa::Users::get_userinfo($.authenticated_user) || 'Guest' ) %>
 
                 <!-- /.dropdown -->
             </ul>
@@ -251,10 +253,7 @@ has 'title';
                 <!-- /.col-lg-12 -->
             </div>
             <div class="row">
-                <div class="col-lg-12">
                     <% inner() %>
-                </div>
-                <!-- /.col-lg-12 -->
             </div>
         </div>
         <!-- /#page-wrapper -->
@@ -274,7 +273,7 @@ has 'title';
     <!-- Morris Charts JavaScript -->
     <script src="/static/bower_components/raphael/raphael-min.js"></script>
     <script src="/static/bower_components/morrisjs/morris.min.js"></script>
-    <script src="/static/js/morris-data.js"></script>
+    <!-- DISABLED <script src="/static/js/morris-data.js"></script> -->
 
     <!-- Custom Theme JavaScript -->
     <script src="/static/dist/js/sb-admin-2.js"></script>
