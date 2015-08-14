@@ -122,33 +122,6 @@ has 'title';
                     <!-- /.dropdown-user -->
                 </li>
 </%method>
-<%method sidebar_no ($items)>
-            <div class="navbar-default sidebar" role="navigation">
-                <div class="sidebar-nav navbar-collapse">
-                    <ul class="nav" id="side-menu">
-% foreach my $item (@$items) {
-                        <li>
-                            <a href="<% $item->{url} %>"><i class="fa <% $item->{type} %> fa-fw"></i> <% $item->{title} %>
-%   if (defined $item->{second}) {
-                            <span class="fa arrow"></span>
-%   }
-                            </a>
-%   if (defined $item->{second}) {
-                            <ul class="nav nav-second-level">
-%     foreach my $second (@{$item->{second}}) {
-                                <li>
-                                    <a href="<% $second->{url} %>"><% $second->{title} %></a>
-                                </li>
-%     }
-                            </ul>
-%   }
-                        </li>
-% }
-                    </ul>
-                </div>
-                <!-- /.sidebar-collapse -->
-            </div>
-</%method>
 
 <%augment wrap><!DOCTYPE html>
 <html lang="en">
@@ -228,20 +201,28 @@ has 'title';
                 <!-- /.dropdown -->
             </ul>
             <!-- /.navbar-top-links -->
+
+
+<%perl>
+  # TODO: this should go to AJAX. And maybe use some perlish function instead of foreach? ;)
+  my @apps;
+  foreach my $app (Sentosa::Users::get_appsuserinfo($.authenticated_user)) {
+    push @apps, { url => $app->{url}, title => $app->{details} };
+  }
+</%perl>
             
             <& sidebar.mas, items=>
                 [
-                  {type=>'fa-dashboard', title=>'Dashboard', url=>''},
-                  {type=>'fa-bar-chart-o', title=>'Charts', url=>'',
-                    second=>[
-                      {title=>'Flot Charts', url=>'flot.html'},
-                      {title=>'Morris Charts', url=>'morris.html'},                      
-                    ]
+                  {type=>'fa-dashboard', title=>'Dashboards', url=>''},
+                  {type=>'fa-bar-chart-o', title=>'Applications', url=>'',
+                    second=> [ @apps ]            
+                    
                   },
                   {type=>'fa-table', title=>'Tables', url=>''},
                   {type=>'fa-edit', title=>'Forms', url=>''},
             
                 ] &>
+
             <!-- /.navbar-static-side -->
         </nav>
 
