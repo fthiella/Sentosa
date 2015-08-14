@@ -21,16 +21,7 @@ Your apps are:
 </ul>
 <hr>
 
-<a href="">Reload this page!</a> or
-<a href="?logout">Logout</a>
-
-<p>
-  <form action="" method="post">
-    username: <input type=text name=username>
-    password: <input type=password name=password>
-    <input type=submit>
-  </form>
-</p>
+<a href="login">Go to login page!</a>
 <%init>
   use Sentosa::Utils;
   use Data::Dumper;

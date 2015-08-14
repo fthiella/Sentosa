@@ -1,0 +1,28 @@
+<%class>
+  has 'items';
+</%class>
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+% foreach my $item (@{$.items}) {
+                        <li>
+                            <a href="<% $item->{url} %>"><i class="fa <% $item->{type} %> fa-fw"></i> <% $item->{title} %>
+%   if (defined $item->{second}) {
+                            <span class="fa arrow"></span>
+%   }
+                            </a>
+%   if (defined $item->{second}) {
+                            <ul class="nav nav-second-level">
+%     foreach my $second (@{$item->{second}}) {
+                                <li>
+                                    <a href="<% $second->{url} %>"><% $second->{title} %></a>
+                                </li>
+%     }
+                            </ul>
+%   }
+                        </li>
+% }
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
