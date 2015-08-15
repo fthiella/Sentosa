@@ -204,14 +204,16 @@ has 'title';
 
 
 <%perl>
-  # TODO: this should go to AJAX. And maybe use some perlish function instead of foreach? ;)
+  # TODO: this should go to AJAX.
+  # TODO: and probably on its own component file (e.g. sidebar.mc or sidebar.json)
+  # TODO: And maybe use some perlish function instead of foreach? ;)
   my @apps;
   foreach my $app (Sentosa::Users::get_appsuserinfo($.authenticated_user)) {
-    push @apps, { url => $app->{url}, title => $app->{details} };
+    push @apps, { url => $app->{url} . '/', title => $app->{details} };
   }
 </%perl>
             
-            <& sidebar.mas, items=>
+            <& sidebar.mi, items=>
                 [
                   {type=>'fa-dashboard', title=>'Dashboards', url=>''},
                   {type=>'fa-bar-chart-o', title=>'Applications', url=>'',

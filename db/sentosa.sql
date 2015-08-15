@@ -83,3 +83,67 @@ create table if not exists af_appgroups (
 insert into af_appgroups (id_app, id_group) values
 (1, 1),
 (2, 2);
+
+-- af_connections: Database connections
+
+create table af_connections (
+  id integer primary key autoincrement,
+  db string,
+  username string,
+  password string
+);
+
+insert into af_connections (id, db, username, password) values
+(1, 'dbi:SQLite:dbname=data/sentosa.db', '', ''),
+(2, 'dbi:SQLite:dbname=data/samples.db', '', '');
+
+-- af_objects: object composing an application
+
+create table af_objects (
+  id integer primary key autoincrement,
+  id_app integer,
+  type varchar(45),
+  name varchar(45),
+  id_connection integer,
+  source string,
+  description varchar(45),
+  FOREIGN KEY(id_app) REFERENCES af_apps(id),
+  FOREIGN KEY(id_connection) REFERENCES af_connections(id)
+);
+
+insert into af_objects values
+-- management
+(1, 1, 'form',  'Users',   1, 'af_users',  'Users Form'),
+(2, 1, 'form',  'Groups',  1, 'af_groups', 'Groups Form'),
+(3, 1, 'query', 'Users',   1, 'af_users',  'Users List'),
+(4, 1, 'query', 'Groups',  1, 'af_groups', 'Groups List'),
+-- sample app
+(5, 2, 'form',  'Gardens', 2, '', 'Gardens Form'),
+(6, 2, 'form',  'Flowers', 2, '', 'Flowers Form'),
+(7, 2, 'query',  'Gardens', 2, '', 'Gardens List'),
+(8, 2, 'query',  'Flowers', 2, '', 'Flowers List');
+
+create table af_forms (
+  id integer primary key autoincrement,
+  id_object integer,
+  box varchar(45),
+  col varchar(45),
+  type varchar(45),
+  caption varchar(45),
+  foreign key (id_object) references af_objects (id)
+);
+
+insert into af_forms values
+(1,  1, 'box1', 'id',        'hidden', 'id'),
+(2,  1, 'box2', 'username',  'text',   'User Name'),
+(3,  1, 'box2', 'password',  'text',   'Password'),
+
+(4,  2, 'box1', 'id',        'hidden', 'id'),
+(5,  2, 'box2', 'groupname', 'text',   'Group Name'),
+
+(6,  5, 'box1', 'id',        'hidden', 'id'),
+(7,  5, 'box2', 'name',      'text',   'Garden Name'),
+(8,  5, 'box2', 'city',      'text',   'City'),
+
+(9,  6, 'box1', 'id',        'hidden', 'id'),
+(10, 6, 'box2', 'name',      'text',   'Flower Name');

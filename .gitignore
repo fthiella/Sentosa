@@ -2,3 +2,4 @@
 data/
 # don't sync log files
 logs/
+logs/poet.log.ERROR
