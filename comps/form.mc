@@ -77,7 +77,7 @@
 							<div class="box-content nopadding">
 
 % # TODO: use Poet function to create URL?
-<form id="<% $.id %>" action="db?id=<% @{$form}[0]->{name} %>" method="post" enctype="multipart/form-data" class='form-horizontal form-bordered'>
+<form id="<% @{$form}[0]->{id} %>" action="db?id=<% @{$form}[0]->{id} %>" method="post" enctype="multipart/form-data" class='form-horizontal form-bordered'>
 
   <input type="hidden" id="is_dirty" name="<% @{$form}[0]->{id} %>_is_dirty" value="0" />
   <input type="hidden" id="goto_record" name="goto_record" value="<% $.record %>" />
@@ -89,11 +89,11 @@
 <%perl>
     foreach my $element (Sentosa::Objects::get_formelements(@{$form}[0]->{id}, $box->{box}, $.authenticated_user)) {
 			given ($element->{type}) {
-				when ('hidden')   { print $.input_hidden($element->{name}, $element->{caption}); }
-        when ('text')     { print $.input_text($element->{name}, $element->{caption}, ''); }
-        when ('checkbox') { print $.input_checkbox($element->{name}, $element->{caption}, ''); }
-        when ('file')			{ print $.input_file($element->{name}, $element->{caption}, ''); }
-				when ('query')    { print $.query($element->{name}, $element->{caption}, '1', '1', '1'); }
+				when ('hidden')   { print $.input_hidden($element->{col}, $element->{caption}); }
+        when ('text')     { print $.input_text($element->{col}, $element->{caption}, ''); }
+        when ('checkbox') { print $.input_checkbox($element->{col}, $element->{caption}, ''); }
+        when ('file')			{ print $.input_file($element->{col}, $element->{caption}, ''); }
+				when ('query')    { print $.query($element->{col}, $element->{caption}, '1', '1', '1'); }
 			}
     }
 </%perl>

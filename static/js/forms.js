@@ -9,7 +9,7 @@ $(document).ready(function()
         console.log(action);
         console.log( $('#' + form + ' input#is_dirty').val() );
         if (!((action==="insert") && ($('#' + form + ' input#is_dirty').val()!=="1"))) {
-          $.post('db?id=' + form, 'button=save&' + $('#' + form).serialize(), function(res) {
+          $.post('db?_id=' + form + '&button=save&' + $('#' + form).serialize(), function(res) {
             console.log('json');
             var arr = $.parseJSON(res); // carica il risultato in un array
             if (arr["_status"] === "OK") {
@@ -33,10 +33,10 @@ $(document).ready(function()
         }
         break;
       default:
-        $.post('db?id=' + form, 'button=' + action + '&' + $('#' + form + ' input#id').serialize()+ '&' + $('#' + form + ' input#goto_record').serialize(), function(res) {
+        $.post('db?_id=' + form + '&button=' + action + '&' + $('#' + form + ' input#id').serialize()+ '&' + $('#' + form + ' input#goto_record').serialize(), function(res) {
         var arr = $.parseJSON(res); // carica il risultato in un array
         if (arr["_status"] === "OK") {
-          if (typeof arr["id"] === "string") {
+          if (typeof arr["id"] === "number") {
             var index;
             /* old style loop */
             for (index = 0; index < fields[form].length; ++index) {

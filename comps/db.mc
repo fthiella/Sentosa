@@ -2,8 +2,9 @@
 Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, etc.
 </%doc>
 <%class>
-  has 'id';
+  has '_id'; # id of the object
   has 'button';
+  has 'id'; # primary key
   # TODO: what if the primary key name is not id? and what if the primary key is not even a single field?
 </%class>
 <%flags>
@@ -12,14 +13,20 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
 <%init>
   use JSON;
   use feature qw( switch );
+  use Poet qw($log);
+  use Sentosa::Objects;
 
-  my ($conn) = Sentosa::Objects::get_formconnection($.id, $.authenticated_user);
+  my ($conn) = Sentosa::Objects::get_formconnection($._id, $.authenticated_user);
+  
+  $log->error("_id=".$._id." id=".$.id);
+  dc($conn);
   
   # create $db connection to the database referred to the form (Apache::DBI should take care of not creating the same connection again)
+
   my $db = DBI->connect($conn->{db}, $conn->{username}, $conn->{password}) or die("connection to ".$conn->{db}." error.\n");
   my $sth;
 
-  my @all_columns = Sentosa::Objects::get_formcolumns($.id, $.authenticated_user);
+  my @all_columns = Sentosa::Objects::get_formcolumns($._id, $.authenticated_user);
   my $csv_columns = join(',', map { $_->{col} } @all_columns);
 
   #
@@ -33,14 +40,12 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
       push @values, $.args->{ $col->{col} };
     }
   }
-  
-  print STDERR $scv_columns, "\n";
 
   my $query;
   my @params = ();
   
   given ($.button)
-  {  
+  {
     # action SAVE
     when ('save') {
       # UPDATE it if ID is given, otherwise INSERT it
@@ -113,5 +118,5 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
   
   my $json = encode_json \%h;
   print $json;
-  print STDERR $json, "\n";
+  $log->error($json);
 </%init>
