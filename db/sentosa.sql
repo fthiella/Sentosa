@@ -106,7 +106,7 @@ create table af_objects (
   name varchar(45),
   id_connection integer,
   source string,
-  orderkey string,
+  pk string,
   description varchar(45),
   FOREIGN KEY(id_app) REFERENCES af_apps(id),
   FOREIGN KEY(id_connection) REFERENCES af_connections(id)
@@ -119,8 +119,8 @@ insert into af_objects values
 (3, 1, 'query', 'Users',   1, 'af_users',  'id', 'Users List'),
 (4, 1, 'query', 'Groups',  1, 'af_groups', 'id', 'Groups List'),
 -- sample app
-(5, 2, 'form',  'Gardens', 2, '',          'id', 'Gardens Form'),
-(6, 2, 'form',  'Flowers', 2, '',          'id', 'Flowers Form'),
+(5, 2, 'form',  'Gardens', 2, 'gardens',   'id', 'Gardens Form'),
+(6, 2, 'form',  'Flowers', 2, 'flowers',   'id', 'Flowers Form'),
 (7, 2, 'query', 'Gardens', 2, '',          'id', 'Gardens List'),
 (8, 2, 'query', 'Flowers', 2, '',          'id', 'Flowers List');
 

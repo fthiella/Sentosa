@@ -140,7 +140,6 @@ sub get_formcolumns {
     $userid
   );
   # TODO: administrators have to see everything!
-
  return @{ $ar };
 }
 
@@ -148,7 +147,7 @@ sub get_formconnection {
   my ($id, $userid) = @_;
   
   my $ar = $dbh->selectall_arrayref(
-    "SELECT c.id, c.db, c.username, c.password, o.source, o.orderkey
+    "SELECT c.id, c.db, c.username, c.password, o.source, o.pk
      FROM
        af_forms f INNER JOIN af_objects o
        ON f.id_object=o.id
@@ -173,8 +172,8 @@ sub get_formconnection {
     ",
     {Slice => {}},
     $id,
-    $userid,
-    $userid
+    1,
+    1
   );
   # TODO: administrators have to see everything!
 

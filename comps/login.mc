@@ -8,10 +8,10 @@
                         <form role="form" action="/" method="post">
                             <fieldset>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Username" name="username" type="username" autofocus>
+                                    <input class="form-control" placeholder="Username" name="_username" type="username" autofocus>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Password" name="password" type="password" value="">
+                                    <input class="form-control" placeholder="Password" name="_password" type="password" value="">
                                 </div>
                                 <div class="checkbox">
                                     <label>

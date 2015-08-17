@@ -1,8 +1,8 @@
 use Sentosa::Users;
 use Sentosa::UserSessions;
 
-has 'username';
-has 'password';
+has '_username';
+has '_password';
 has 'logout';
 has 'authenticated_user';
 
@@ -14,8 +14,8 @@ method wrap() {
       $m->redirect('/');
   };
 
-  if ($.username || $.password) {
-    $.authenticated_user( Sentosa::Users::auth_user( $.username, $.password ) );
+  if ($._username || $._password) {
+    $.authenticated_user( Sentosa::Users::auth_user( $._username, $._password ) );
 
     if (defined $.authenticated_user) {
       $m->session->{auth_id} = Sentosa::UserSessions::add_session($.authenticated_user);
