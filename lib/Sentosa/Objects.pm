@@ -33,7 +33,7 @@ sub get_object {
   );
   # TODO: administrators have to see everything!
 
- return $ar;
+ return @{ $ar };
 }
 
 sub get_formboxes {

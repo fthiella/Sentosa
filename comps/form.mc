@@ -63,7 +63,8 @@
 </%method>
 
 
-% my $form = Sentosa::Objects::get_object($.id, 'form', $.authenticated_user); # TODO: dereference hash...?
+% my ($form) = Sentosa::Objects::get_object($.id, 'form', $.authenticated_user); # TODO: dereference hash...?
+% if (!$form) { $m->not_found(); }; # form not found
 <script src="/static/js/forms.js"></script>
 
 <div class="row">
@@ -71,23 +72,23 @@
 						<div class="box box-bordered box-color">
 							<div class="box-title">
 								<h3>
-									<i class="fa fa-th-list"></i><% @{$form}[0]->{description} | HTMLEntities %>
+									<i class="fa fa-th-list"></i><% $form->{description} | HTMLEntities %>
                 </h3>
 							</div>
 							<div class="box-content nopadding">
 
 % # TODO: use Poet function to create URL?
-<form id="<% @{$form}[0]->{id} %>" action="db?id=<% @{$form}[0]->{id} %>" method="post" enctype="multipart/form-data" class='form-horizontal form-bordered'>
+<form id="<% $form->{id} %>" action="db?id=<% $form->{id} %>" method="post" enctype="multipart/form-data" class='form-horizontal form-bordered'>
 
-  <input type="hidden" id="is_dirty" name="<% @{$form}[0]->{id} %>_is_dirty" value="0" />
+  <input type="hidden" id="is_dirty" name="<% $form->{id} %>_is_dirty" value="0" />
   <input type="hidden" id="goto_record" name="goto_record" value="<% $.record %>" />
 
 % # TODO: is order of boxes guaranteed?
-% foreach my $box (Sentosa::Objects::get_formboxes(@{$form}[0]->{id}, $.authenticated_user)) {  
-<div id=<% @{$form}[0]->{id} %>_<% $box->{box} %>" class="form-group">
+% foreach my $box (Sentosa::Objects::get_formboxes($form->{id}, $.authenticated_user)) {  
+<div id=<% $form->{id} %>_<% $box->{box} %>" class="form-group">
 
 <%perl>
-    foreach my $element (Sentosa::Objects::get_formelements(@{$form}[0]->{id}, $box->{box}, $.authenticated_user)) {
+    foreach my $element (Sentosa::Objects::get_formelements($form->{id}, $box->{box}, $.authenticated_user)) {
 			given ($element->{type}) {
 				when ('hidden')   { print $.input_hidden($element->{col}, $element->{caption}); }
         when ('text')     { print $.input_text($element->{col}, $element->{caption}, ''); }
@@ -100,8 +101,8 @@
 
 </div>
 % }
-<% $.input_message(@{$form}[0]->{id}, '') %>
-<% $.input_actions(@{$form}[0]->{id}) %>
+<% $.input_message($form->{id}, '') %>
+<% $.input_actions($form->{id}) %>
 
 </form>
 

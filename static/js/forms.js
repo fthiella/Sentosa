@@ -9,11 +9,8 @@ $(document).ready(function()
         console.log(action);
         console.log( $('#' + form + ' input#is_dirty').val() );
         if (!((action==="insert") && ($('#' + form + ' input#is_dirty').val()!=="1"))) {
-          $.post('db?_id=' + form + '&button=save&' + $('#' + form).serialize(), function(res) {
-            console.log('json');
-            var arr = $.parseJSON(res); // carica il risultato in un array
-            if (arr["_status"] === "OK") {
-            console.log('status ok');
+          $.getJSON('db', '_id=' + form + '&button=save&' + $('#' + form).serialize(), function(res) {
+            if (res["_status"] === "OK") { // TODO: is this really a good idea?
               $('#' + form + ' input#is_dirty').val('');
               
               if (action==="insert") {
@@ -33,25 +30,16 @@ $(document).ready(function()
         }
         break;
       default:
-        $.post('db?_id=' + form + '&button=' + action + '&' + $('#' + form + ' input#id').serialize()+ '&' + $('#' + form + ' input#goto_record').serialize(), function(res) {
-        var arr = $.parseJSON(res); // carica il risultato in un array
-        if (arr["_status"] === "OK") {
-          if (typeof arr["id"] === "number") {
-            var index;
-            /* old style loop */
-            for (index = 0; index < fields[form].length; ++index) {
-              $('#' + form + ' input#'+fields[form][index]).val(arr[ fields[form][index] ]);
-              
-              /* LINKED FIELDS */
-              
-              if (fields[form][index]) {
-                $("input[name=search_giardini_id]").val(arr[ fields[form][index] ]);
-                $("input[name=search_giardini_id]").trigger('keyup');
-              }
-            }
-          }
-        }
-      });
+        $.getJSON('db', '_id=' + form + '&button=' + action + '&' + $('#' + form + ' input#id').serialize()+ '&' + $('#' + form + ' input#goto_record').serialize(), function( res ) {
+          $.each( res, function( key, val ) {
+          console.log(key, val);
+          fields[key] = val;
+          $('#' + form + ' input#'+key).val(val);
+        })});
+        /* LINKED FIELDS
+          $("input[name=search_giardini_id]").val(arr[ fields[form][index] ]);
+          $("input[name=search_giardini_id]").trigger('keyup');
+        */
     }
   }
 

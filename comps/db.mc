@@ -17,8 +17,9 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
   my ($conn) = Sentosa::Objects::get_formconnection($._id, $.authenticated_user);
 
   if (!$conn) {
-    die('undef connection ('.$._id.', '.$.authenticated_user.')');
-  }
+    # connection not found - object does not exist, or user is not allowed, or user is not authenticated
+    $m->not_found();
+  };
   
   # create $db connection to the database referred to the form (Apache::DBI should take care of not creating the same connection again)
 
@@ -96,31 +97,25 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
    
   }
   
-  dc($query);
-  
   my %h = ();
   if ($query =~ /^SELECT/) {
-    print STDERR $query, "\n";
     $sth = $db->prepare($query);
     $sth->execute(@params);
     my $values = $sth->fetchrow_hashref();
     $sth->finish();
 
-    foreach my $col (@all_columns) {
+    if ($$values{ $conn->{pk}} ) { # pk is defined so the query succeeded
+      foreach my $col (@all_columns) {
         $h{ $col->{col} } = $$values{ $col->{col} };
+      }
+      $m->send_json( \%h );
     }
-    $h{_status} = 'OK';
-    my $json = encode_json \%h;
   } else {
     $sth = $db->prepare($query);
     $sth->execute(@params);
     $sth->finish();
 
-    $h{_status} = 'OK';
-    my $json = encode_json \%h; 
+    $h{_status} = 'OK'; # TODO: is this really a good idea? Anyway, need to check status of the query, need to get LAST_INSERT_ID
+    $m->send_json( \%h );
   }
-  
-  my $json = encode_json \%h;
-  print $json;
-  $log->error($json);
 </%init>
