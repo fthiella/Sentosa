@@ -227,29 +227,7 @@ has 'title';
                 <!-- /.dropdown -->
             </ul>
             <!-- /.navbar-top-links -->
-
-
-<%perl>
-  # TODO: this should go to AJAX.
-  # TODO: and probably on its own component file (e.g. sidebar.mc or sidebar.json)
-  # TODO: And maybe use some perlish function instead of foreach? ;)
-  my @apps;
-  foreach my $app (Sentosa::Users::get_appsuserinfo($.authenticated_user)) {
-    push @apps, { url => $app->{url} . '/', title => $app->{details} };
-  }
-</%perl>
-            
-            <& sidebar.mi, items=>
-                [
-                  {type=>'fa-dashboard', title=>'Dashboards', url=>''},
-                  {type=>'fa-bar-chart-o', title=>'Applications', url=>'',
-                    second=> [ @apps ]            
-                    
-                  },
-                  {type=>'fa-table', title=>'Tables', url=>''},
-                  {type=>'fa-edit', title=>'Forms', url=>''},
-            
-                ] &>
+            <& sidebar.mc, authenticated_user => $.authenticated_user &>
 
             <!-- /.navbar-static-side -->
         </nav>
