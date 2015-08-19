@@ -1,5 +1,5 @@
 <%class>
-  has 'id';
+  has '_id';
 	has 'record' => (default => '');
 </%class>
 <%init>
@@ -63,7 +63,7 @@
 </%method>
 
 
-% my ($form) = Sentosa::Objects::get_object($.id, 'form', $.authenticated_user); # TODO: dereference hash...?
+% my ($form) = Sentosa::Objects::get_object($._id, 'form', $.authenticated_user);
 % if (!$form) { $m->not_found(); }; # form not found
 <script src="/static/js/forms.js"></script>
 

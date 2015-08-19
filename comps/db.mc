@@ -9,7 +9,6 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
   extends => 'Base.mp';
 </%flags>
 <%init>
-  use JSON;
   use feature qw( switch );
   use Poet qw($log);
   use Sentosa::Objects;

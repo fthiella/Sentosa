@@ -148,3 +148,20 @@ insert into af_forms values
 
 (9,  6, 'box1', 'id',        'hidden', 'id'),
 (10, 6, 'box2', 'name',      'text',   'Flower Name');
+
+create table af_query (
+  id integer primary key autoincrement,
+  id_object integer,
+  col string,
+  caption string,
+  link string,
+  global_search int,
+  foreign key(id_object) references af_objects(id)
+);
+
+insert into af_query (id_object, col, caption, link, global_search) values
+(3, 'id',        'id',         NULL, 0),
+(3, 'username',  'User Name',  NULL, 1),
+(3, 'password',  'Password',   NULL, 0),
+(4, 'id',        'id',         NULL, 0),
+(4, 'groupname', 'Group Name', NULL, 1);

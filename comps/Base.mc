@@ -142,6 +142,12 @@ has 'title';
 
     <!-- MetisMenu CSS -->
     <link href="/static/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+    
+    <!-- DataTables CSS -->
+    <link href="/static/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
+
+    <!-- DataTables Responsive CSS -->
+    <link href="/static/bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
 
     <!-- Timeline CSS -->
     <link href="/static/dist/css/timeline.css" rel="stylesheet">
@@ -181,6 +187,10 @@ has 'title';
 
     <!-- Custom Theme JavaScript -->
     <script src="/static/dist/js/sb-admin-2.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="/static/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
+    <script src="/static/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
     <div id="wrapper">
 
