@@ -1,6 +1,6 @@
 <%class>
   has '_id';
-	has 'record' => (default => '');
+	has '_record' => (default => '');
 </%class>
 <%init>
   use Sentosa::Objects;
@@ -81,7 +81,7 @@
 <form id="<% $form->{id} %>" action="db?id=<% $form->{id} %>" method="post" enctype="multipart/form-data" class='form-horizontal form-bordered'>
 
   <input type="hidden" id="is_dirty" name="<% $form->{id} %>_is_dirty" value="0" />
-  <input type="hidden" id="goto_record" name="goto_record" value="<% $.record %>" />
+  <input type="hidden" id="<% $form->{id} %>_goto_record" name="goto_record" value="<% $._record %>" />
 
 % # TODO: is order of boxes guaranteed?
 % foreach my $box (Sentosa::Objects::get_formboxes($form->{id}, $.authenticated_user)) {  

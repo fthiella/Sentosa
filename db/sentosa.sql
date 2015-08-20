@@ -114,15 +114,15 @@ create table af_objects (
 
 insert into af_objects values
 -- management
-(1, 1, 'form',  'Users',   1, 'af_users',  'id', 'Users Form'),
-(2, 1, 'form',  'Groups',  1, 'af_groups', 'id', 'Groups Form'),
-(3, 1, 'query', 'Users',   1, 'af_users',  'id', 'Users List'),
-(4, 1, 'query', 'Groups',  1, 'af_groups', 'id', 'Groups List'),
+(1, 1, 'form',  'Users',       1, 'af_users',    'id', 'Users Form'),
+(2, 1, 'form',  'Groups',      1, 'af_groups',   'id', 'Groups Form'),
+(3, 1, 'query', 'Users',       1, 'af_users',    'id', 'Users List'),
+(4, 1, 'query', 'Groups',      1, 'af_groups',   'id', 'Groups List'),
 -- sample app
-(5, 2, 'form',  'Gardens', 2, 'gardens',   'id', 'Gardens Form'),
-(6, 2, 'form',  'Flowers', 2, 'flowers',   'id', 'Flowers Form'),
-(7, 2, 'query', 'Gardens', 2, '',          'id', 'Gardens List'),
-(8, 2, 'query', 'Flowers', 2, '',          'id', 'Flowers List');
+(5, 2, 'form',  'Gardens',     2, 'gardens',     'id', 'Gardens Form'),
+(6, 2, 'form',  'Attractions', 2, 'attractions', 'id', 'Attractions Form'),
+(7, 2, 'query', 'Gardens',     2, 'gardens',     'id', 'Gardens List'),
+(8, 2, 'query', 'Flowers',     2, 'attractions', 'id', 'Attractions List');
 
 create table af_forms (
   id integer primary key autoincrement,
@@ -135,19 +135,20 @@ create table af_forms (
 );
 
 insert into af_forms values
-(1,  1, 'box1', 'id',        'hidden', 'id'),
-(2,  1, 'box2', 'username',  'text',   'User Name'),
-(3,  1, 'box2', 'password',  'text',   'Password'),
+(1,  1, 'box1', 'id',         'hidden', 'id'),
+(2,  1, 'box2', 'username',   'text',   'User Name'),
+(3,  1, 'box2', 'password',   'text',   'Password'),
 
-(4,  2, 'box1', 'id',        'hidden', 'id'),
-(5,  2, 'box2', 'groupname', 'text',   'Group Name'),
+(4,  2, 'box1', 'id',         'hidden', 'id'),
+(5,  2, 'box2', 'groupname',  'text',   'Group Name'),
 
-(6,  5, 'box1', 'id',        'hidden', 'id'),
-(7,  5, 'box2', 'name',      'text',   'Garden Name'),
-(8,  5, 'box2', 'city',      'text',   'City'),
+(6,  5, 'box1', 'id',         'hidden', 'id'),
+(7,  5, 'box2', 'name',       'text',   'Garden Name'),
+(8,  5, 'box2', 'city',       'text',   'City'),
 
-(9,  6, 'box1', 'id',        'hidden', 'id'),
-(10, 6, 'box2', 'name',      'text',   'Flower Name');
+(9,  6, 'box1', 'id',         'hidden', 'id'),
+(10, 6, 'box2', 'id_garden',  'text',   'id_garden'),
+(11, 6, 'box2', 'attraction', 'text',   'Flower Name');
 
 create table af_query (
   id integer primary key autoincrement,
@@ -160,8 +161,17 @@ create table af_query (
 );
 
 insert into af_query (id_object, col, caption, link, global_search) values
-(3, 'id',        'id',         NULL, 0),
-(3, 'username',  'User Name',  NULL, 1),
-(3, 'password',  'Password',   NULL, 0),
-(4, 'id',        'id',         NULL, 0),
-(4, 'groupname', 'Group Name', NULL, 1);
+(3, 'id',         'id',         NULL,         0),
+(3, 'username',   'User Name',  NULL,         1),
+(3, 'password',   'Password',   NULL,         0),
+
+(4, 'id',         'id',         NULL,         0),
+(4, 'groupname',  'Group Name', NULL,         1),
+
+(7, 'id',         'id',         NULL,         0),
+(7, 'name',       'Name',       NULL,         0),
+(7, 'city',       'City',       NULL,         0),
+
+(8, 'id',         'id',         NULL,         0),
+(8, 'id_garden',  'id_garden',  'form?_id=5', 0),
+(8, 'attraction', 'Attraction', NULL,         0);

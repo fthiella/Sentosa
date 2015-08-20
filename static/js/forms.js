@@ -30,7 +30,14 @@ $(document).ready(function()
         }
         break;
       default:
-        $.getJSON('db', '_id=' + form + '&button=' + action + '&' + $('#' + form + ' input#id').serialize()+ '&' + $('#' + form + ' input#goto_record').serialize(), function( res ) {
+        $.getJSON(
+            'db',
+            '_id=' + form + '&' +
+            'button=' + action + '&' +
+            $('#' + form + ' input#id').serialize()+ '&' +
+            $('input#' + form + '_goto_record').serialize(),
+            function( res ) {
+          console.log('Goto record=', $('input#' + form + '_goto_record').val());
           $.each( res, function( key, val ) {
           console.log(key, val);
           fields[key] = val;

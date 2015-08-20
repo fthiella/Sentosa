@@ -24,8 +24,9 @@
   
   my (@columns) = Sentosa::Objects::get_querycolumns($._id, $.authenticated_user);
   my @fields = map { $_->{col} } @columns;
+  my @links = map { $_->{link} } @columns;
   
-  my $db = DBI->connect($conn->{db}, $conn->{username}, $conn->{password}) or die("connection to ".$conn->{db}." error.\n");
+  my $h = DBI->connect($conn->{db}, $conn->{username}, $conn->{password}) or die("connection to ".$conn->{db}." error.\n");
 
   my @active_conditions = ();
   my @active_filters = ();
@@ -60,25 +61,27 @@
   my $sth;
 
   # get number of total rows, and number of total filtered rows
-  my ($iTotalRecords) = $db->selectrow_array($query_cnt_all);
-  my ($iTotalDisplayRecords) = $db->selectrow_array($query_cnt_filt, {Slice => {}}, @active_filters);
+  my ($iTotalRecords) = $h->selectrow_array($query_cnt_all);
+  my ($iTotalDisplayRecords) = $h->selectrow_array($query_cnt_filt, undef, @active_filters);
 
   #### get rows ####
 
   my @rows;
 
   # TODO: LIMIT and OFFSET depends on the database, is there a native DBI solution for this?
-  if ($conn->{db} =~ /^:mysql:|:SQLite:/) {
-    $sth = $db->prepare("$query_filt LIMIT ".int($.iDisplayStart).", ".int($.iDisplayLength));
-  } elsif ($conn->{db} =~ /^:Pg:/) {
-    $sth = $db->prepare("$query_filt LIMIT ".int($.iDisplayLength)." OFFSET ".int($.iDisplayStart));
+  if ($h->{Driver}->{Name} =~ /^mysql$|^SQLite$/) {
+    $sth = $h->prepare("$query_filt LIMIT ".int($.iDisplayStart).", ".int($.iDisplayLength));
+  } elsif ($h->{Driver}->{Name} =~ /^Pg$/) {
+    $sth = $h->prepare("$query_filt LIMIT ".int($.iDisplayLength)." OFFSET ".int($.iDisplayStart));
   }
   $sth->execute(@active_filters);
 
   while (my @row = $sth->fetchrow_array()) {
-    # foreach my $field_num (@links) {
-    #   $row[${$field_num}[0]] = '<a href="'.${$field_num}[1].'&record='.$row[${$field_num}[0]].'">'.$row[${$field_num}[0]].'</a>';
-    # }
+    for (my $index=0; $index<=$#links; $index++) {
+      if ($links[$index]) {      
+        $row[$index] = qq{<a href="$links[$index]&_record=$row[$index]">$row[$index]</a>};
+      }
+    }
     push @rows, \@row;
   }
 
