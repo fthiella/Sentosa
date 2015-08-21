@@ -1,0 +1,30 @@
+<%class>
+  has 'items';
+</%class>
+<li class="dropdown">
+  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+    <i class="fa fa-envelope fa-fw"></i>  <i class="fa fa-caret-down"></i>
+  </a>
+  <ul class="dropdown-menu dropdown-messages">
+% foreach my $item (@{$.items}) {
+<li>
+    <a href="#">
+      <div>
+        <strong><% $item->{from} %></strong>
+        <span class="pull-right text-muted">
+          <em><% $item->{when} %></em>
+        </span>
+        </div>
+      <div><% $item->{msg} %></div>
+    </a>
+</li>
+<li class="divider"></li>
+% }
+    <li>
+      <a class="text-center" href="#">
+      <strong>Read All Messages</strong>
+      <i class="fa fa-angle-right"></i>
+      </a>
+    </li>
+  </ul>
+</li>

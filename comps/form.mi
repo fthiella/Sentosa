@@ -1,15 +1,10 @@
 <%class>
-  has 'id';
-	has 'record' => (default => '');
+  has 'form';
 </%class>
-<%init>
-  use feature qw( switch );
-</%init>
-<%flags>
-#  extends => '../Base.mp';
-</%flags>
-% # ---------- INPUT ELEMENTS ----------
 
+<%init>
+  use feature "switch";
+</%init>
 
 <%method input_hidden ($id, $caption)>    <label for="<% $id | HTMLEntities %>" class="control-label col-sm-2"><% $caption | HTMLEntities %> (hidden)</label>
     <div class="col-sm-10">
@@ -43,7 +38,7 @@
 
 
 <%method query ($id, $hide_title, $hide_top, $hide_bottom) >
-<& query.mc, id => $id, hide_title => $hide_title, hide_top => $hide_top, hide_bottom => $hide_bottom &>
+<& query.mc, _id => $id, authenticated_user=>$.authenticated_user, hide_title => $hide_title, hide_top => $hide_top, hide_bottom => $hide_bottom &>
 </%method>
 
 
@@ -63,62 +58,48 @@
   </div>
 </%method>
 
-
-% # ------------------------------------
-% my $sth = $samdb->prepare('SELECT id, description FROM am_objects WHERE objectType=? AND objectName=?');
-% $sth->execute('Form', $.id);
-% my $obj = $sth->fetchrow_hashref() || die("Form not found!");
-% $sth->finish();
-
-<script src="form.js"></script>
+<script src="/static/js/forms.js"></script>
 
 <div class="row">
 					<div class="col-sm-12">
 						<div class="box box-bordered box-color">
 							<div class="box-title">
 								<h3>
-									<i class="fa fa-th-list"></i><% $$obj{description} | HTMLEntities %>
+									<i class="fa fa-th-list"></i><% $.form->{description} | HTMLEntities %>
                 </h3>
 							</div>
 							<div class="box-content nopadding">
 
-<form id="<% $.id %>" action="db/<% $.id %>" method="post" enctype="multipart/form-data" class='form-horizontal form-bordered'>
+% # TODO: use Poet function to create URL?
+<form id="<% $.form->{id} %>" action="db?_id=<% $.form->{id} %>" method="post" enctype="multipart/form-data" class='form-horizontal form-bordered'>
+% # TODO: give a unique name to is_dirty
+  <input type="hidden" id="is_dirty" name="<% $.form->{id} %>_is_dirty" value="0" />
+  <input type="hidden" id="<% $.form->{id} %>_goto_record" name="goto_record" value="<% $.form->{record} %>" />
 
-  <input type="hidden" id="is_dirty" name="is_dirty" value="0" />
-  <input type="hidden" id="goto_record" name="goto_record" value="<% $.record %>" />
+% # TODO: is order of boxes guaranteed?
+% foreach my $box (@{ $.form->{boxes} }) {  
+<div id=<% $.form->{id} %>_<% $box->{name} %>" class="form-group">
+
 <%perl>
-  my $sth_box = $samdb->prepare("SELECT DISTINCT box FROM am_forms WHERE objectid=?");
-  $sth_box->execute($$obj{id});
-
-  while (my $box = $sth_box->fetchrow_array()) {
-</%perl>
-<div id=<% $.id %>_<% $box %>" class="form-group">
-<%perl>
-    my $sth_itm = $samdb->prepare("SELECT sourcecolumn, type, name, caption FROM am_forms WHERE objectid=? AND box=?");
-    $sth_itm->execute($$obj{id}, $box);
-
-    while (my ($sourcecolumn, $type, $name, $caption) = $sth_itm->fetchrow_array()) {
-			given ($type) {
-				when ('hidden')   { print $.input_hidden($name, $caption); }
-        when ('text')     { print $.input_text($name, $caption, ''); }
-        when ('checkbox') { print $.input_checkbox($name, $caption, ''); }
-        when ('file')			{ print $.input_file($name, $caption, ''); }
-				when ('query')    { print $.query($name, '1', '1', '1'); }
+    foreach my $element (@{ $box->{elements} }) {
+			given ($element->{type}) {
+				when ('hidden')   { print $.input_hidden($element->{col}, $element->{caption}); }
+        when ('text')     { print $.input_text($element->{col}, $element->{caption}, ''); }
+        when ('checkbox') { print $.input_checkbox($element->{col}, $element->{caption}, ''); }
+        when ('file')			{ print $.input_file($element->{col}, $element->{caption}, ''); }
+				when ('query')    { print $.query($element->{col}, $element->{caption}, '1', '1', '1'); }
 			}
-   }
-		
-	 $sth_itm->finish();
-   print '</div>';
-  }
-  $sth_box->finish();
-	
-	print $.input_message($.id, '');
-
-	print $.input_actions($.id);
+    }
 </%perl>
+
+</div>
+% }
+<% $.input_message($.form->{id}, '') %>
+<% $.input_actions($.form->{id}) %>
+
 </form>
 
               </div>
 						</div>
 					</div>
-				</div>
+</div>

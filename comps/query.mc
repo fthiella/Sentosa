@@ -6,7 +6,7 @@
 </%class>
 <%init>
   use Sentosa::Objects;
-
+  
   my ($select) = Sentosa::Objects::get_object($._id, 'query', $.authenticated_user);
   if (!$select) { $m->not_found(); }; # query not found
   

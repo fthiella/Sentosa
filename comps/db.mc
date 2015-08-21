@@ -36,7 +36,7 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
   my @values = ();
   
   foreach my $col (@all_columns) {
-    # TODO: primary key is not always id, check the actual name!
+    # TODO: primary key is not always a single field
     unless ($col->{col} eq $conn->{pk}) {
       push @columns, $col->{col};
       push @values, $.args->{ $col->{col} };
@@ -56,7 +56,6 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
         push @values, $pk;
         $query='UPDATE '.$conn->{source}.' SET '.join('=?,', @columns).'=? WHERE '.$conn->{pk}.'=?';
         @params=@values;
-        # if succeded, set is_dirty to zero! if not, raise an error?
       } else {
         $query='INSERT INTO '.$conn->{source}.' ('.join(',', @columns).') VALUES ('.substr('?,'x scalar @values, 0, -1).')';
         @params=@values;

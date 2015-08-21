@@ -21,7 +21,7 @@ $(document).ready(function()
             }
           });
         }
-        console.log( $('#' + form + ' input#is_dirty').val() );
+        console.log('is dirty=', $('#' + form + ' input#is_dirty').val() );
         // if it's insert and dirty is now=0 then blank the form
         if ((action==="insert") && ($('#' + form + ' input#is_dirty').val()!="1")) {
           for (index = 0; index < fields[form].length; ++index) {
@@ -30,6 +30,7 @@ $(document).ready(function()
         }
         break;
       default:
+        /* TODO: check is_dirty first! and is_dirty will have a unique name */
         $.getJSON(
             'db',
             '_id=' + form + '&' +
