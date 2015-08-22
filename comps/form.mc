@@ -35,10 +35,9 @@ Example:
   foreach my $box (Sentosa::Objects::get_formboxes($form->{id}, $.authenticated_user)) {
     my @box_elements;
     foreach my $element (Sentosa::Objects::get_formelements($form->{id}, $box->{box}, $.authenticated_user)) {
-      push @box_elements, {caption=>$element->{caption}, col=>$element->{col}, type=>$element->{type}};
+      push @box_elements, {caption=>$element->{caption}, col=>$element->{col}, type=>$element->{type}, params=>$element->{params}};
     }
     push @boxes, {name=>$box->{box}, elements=>\@box_elements};
   }
 </%init>
-
-<& form.mi, form=>$form, authenticated_user=>$.authenticated_user &>
+<& form.mi, form=>{id=>$form->{id}, description=>$form->{description}, boxes=>\@boxes}, authenticated_user=>$.authenticated_user &>

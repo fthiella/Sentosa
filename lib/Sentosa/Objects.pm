@@ -105,7 +105,7 @@ sub get_formelements {
   my ($id, $box, $userid) = @_;
   
   my $ar = $dbh->selectall_arrayref(
-    "SELECT f.id, f.box, f.col, f.type, f.caption
+    "SELECT f.id, f.box, f.col, f.type, f.caption, f.params
      FROM
        af_forms f INNER JOIN af_objects o
        ON f.id_object=o.id

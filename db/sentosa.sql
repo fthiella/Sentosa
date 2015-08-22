@@ -122,7 +122,7 @@ insert into af_objects values
 (5, 2, 'form',  'Gardens',     2, 'gardens',     'id', 'Gardens Form'),
 (6, 2, 'form',  'Attractions', 2, 'attractions', 'id', 'Attractions Form'),
 (7, 2, 'query', 'Gardens',     2, 'gardens',     'id', 'Gardens List'),
-(8, 2, 'query', 'Flowers',     2, 'attractions', 'id', 'Attractions List');
+(8, 2, 'query', 'Attractions', 2, 'attractions', 'id', 'Attractions List');
 
 create table af_forms (
   id integer primary key autoincrement,
@@ -131,24 +131,26 @@ create table af_forms (
   col varchar(45),
   type varchar(45),
   caption varchar(45),
+  params string,
   foreign key (id_object) references af_objects (id)
 );
 
 insert into af_forms values
-(1,  1, 'box1', 'id',         'hidden', 'id'),
-(2,  1, 'box2', 'username',   'text',   'User Name'),
-(3,  1, 'box2', 'password',   'text',   'Password'),
+(1,  1, 'box1', 'id',          'hidden', 'id',          NULL),
+(2,  1, 'box2', 'username',    'text',   'User Name',   NULL),
+(3,  1, 'box2', 'password',    'text',   'Password',    NULL),
 
-(4,  2, 'box1', 'id',         'hidden', 'id'),
-(5,  2, 'box2', 'groupname',  'text',   'Group Name'),
+(4,  2, 'box1', 'id',          'hidden', 'id',          NULL),
+(5,  2, 'box2', 'groupname',   'text',   'Group Name',  NULL),
 
-(6,  5, 'box1', 'id',         'hidden', 'id'),
-(7,  5, 'box2', 'name',       'text',   'Garden Name'),
-(8,  5, 'box2', 'city',       'text',   'City'),
+(6,  5, 'box1', 'id',          'hidden', 'id',          NULL),
+(7,  5, 'box2', 'name',        'text',   'Garden Name', NULL),
+(8,  5, 'box2', 'city',        'text',   'City',        NULL),
+(9,  5, 'box3', '8',           'query',  'Attractions', 'q.id_garden=f.id'),
 
-(9,  6, 'box1', 'id',         'hidden', 'id'),
-(10, 6, 'box2', 'id_garden',  'text',   'id_garden'),
-(11, 6, 'box2', 'attraction', 'text',   'Flower Name');
+(10, 6, 'box1', 'id',          'hidden', 'id',          NULL),
+(11, 6, 'box2', 'id_garden',   'text',   'id_garden',   NULL),
+(12, 6, 'box2', 'attraction',  'text',   'Flower Name', NULL);
 
 create table af_query (
   id integer primary key autoincrement,

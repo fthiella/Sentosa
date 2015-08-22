@@ -70,6 +70,8 @@ has 'title';
     <!-- DataTables JavaScript -->
     <script src="/static/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
     <script src="/static/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+    
+    <script src="/static/js/sentosa.js"></script>
 
     <div id="wrapper">
 

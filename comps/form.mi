@@ -37,8 +37,11 @@
 </%method>
 
 
-<%method query ($id, $hide_title, $hide_top, $hide_bottom) >
-<& query.mc, _id => $id, authenticated_user=>$.authenticated_user, hide_title => $hide_title, hide_top => $hide_top, hide_bottom => $hide_bottom &>
+<%method query ($id, $caption, $data_link, $hide_title, $hide_top, $hide_bottom) >
+%  # provides link from some form fields to some table fields
+%  $data_link =~ /^q\.(.+)=f\.(.+)$/;
+%  my $table_link = "data-from-form=\"".$.form->{id}."\" data-from-field=\"$2\" data-to-table=\"$id\" data-to-field=\"$1\"";
+<& query.mc, _id => $id, authenticated_user=>$.authenticated_user, table_link=>$table_link, hide_title => 1, hide_top => 1, hide_bottom => 0 &>
 </%method>
 
 
@@ -57,8 +60,6 @@
     <button type="button" id="insert" value="insert" class="btn">New</button>
   </div>
 </%method>
-
-<script src="/static/js/forms.js"></script>
 
 <div class="row">
 					<div class="col-sm-12">
@@ -87,7 +88,7 @@
         when ('text')     { print $.input_text($element->{col}, $element->{caption}, ''); }
         when ('checkbox') { print $.input_checkbox($element->{col}, $element->{caption}, ''); }
         when ('file')			{ print $.input_file($element->{col}, $element->{caption}, ''); }
-				when ('query')    { print $.query($element->{col}, $element->{caption}, '1', '1', '1'); }
+				when ('query')    { print $.query($element->{col}, $element->{caption}, $element->{params}, '1', '1', '1'); }
 			}
     }
 </%perl>
