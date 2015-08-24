@@ -13,7 +13,7 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
   use Poet qw($log);
   use Sentosa::Objects;
 
-  my ($conn) = Sentosa::Objects::get_formconnection($._id, $.authenticated_user);
+  my ($conn) = Sentosa::Objects::get_formconnection($._id, $m->session->{auth_id});
 
   if (!$conn) {
     # connection not found - object does not exist, or user is not allowed, or user is not authenticated
@@ -27,7 +27,7 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
   # TODO: what if the primary key is not a single field?
   my $pk = $.args->{ $conn->{pk} };
 
-  my @all_columns = Sentosa::Objects::get_formcolumns($._id, $.authenticated_user);
+  my @all_columns = Sentosa::Objects::get_formcolumns($._id, $m->session->{auth_id});
   my $csv_columns = join(',', map { $_->{col} } @all_columns);
   dc($csv_columns);
 

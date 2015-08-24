@@ -13,16 +13,16 @@
 <%init>
   use Sentosa::Objects;
 
-  my ($select) = Sentosa::Objects::get_object($._id, 'query', $.authenticated_user);
+  my ($select) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
   if (!$select) { $m->not_found(); }; # query not found
   
-  my ($conn) = Sentosa::Objects::get_queryconnection($._id, $.authenticated_user);
+  my ($conn) = Sentosa::Objects::get_queryconnection($._id, $m->session->{auth_id});
   if (!$conn) {
     # connection not found - object does not exist, or user is not allowed, or user is not authenticated
     $m->not_found();
   };
   
-  my (@columns) = Sentosa::Objects::get_querycolumns($._id, $.authenticated_user);
+  my (@columns) = Sentosa::Objects::get_querycolumns($._id, $m->session->{auth_id});
   my @fields = map { $_->{col} } @columns;
   my @links = map { $_->{link} } @columns;
   
@@ -74,11 +74,13 @@
   } elsif ($h->{Driver}->{Name} =~ /^Pg$/) {
     $sth = $h->prepare("$query_filt LIMIT ".int($.iDisplayLength)." OFFSET ".int($.iDisplayStart));
   }
+
   $sth->execute(@active_filters);
 
   while (my @row = $sth->fetchrow_array()) {
     for (my $index=0; $index<=$#links; $index++) {
-      if ($links[$index]) {      
+      if ($links[$index]) {
+        # TODO: this shoud be handled client side with dataSrc? see it here https://datatables.net/reference/option/ajax
         $row[$index] = qq{<a href="$links[$index]&_record=$row[$index]">$row[$index]</a>};
       }
     }

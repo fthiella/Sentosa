@@ -1,13 +1,13 @@
 <%class>
 </%class>
 <p>
-You are logged in as <% Sentosa::Users::get_userinfo($.authenticated_user) || 'Guest' %>.
+You are logged in as <% $m->session->{auth_id} || 'Guest' %>.
 </p>
 
 <p>
 Your groups are:
 <ul>
-% foreach my $group (Sentosa::Users::get_groupsuserinfo($.authenticated_user)) {
+% foreach my $group (Sentosa::Users::get_groupsuserinfo($m->session->{auth_id})) {
   <li><% $group->{groupname} %></li>
 % }
 </ul>
@@ -15,7 +15,7 @@ Your groups are:
 </p>
 Your apps are:
 <ul>
-% foreach my $app (Sentosa::Users::get_appsuserinfo($.authenticated_user)) {
+% foreach my $app (Sentosa::Users::get_appsuserinfo($m->session->{auth_id})) {
   <li><% $app->{url} %></li>
 % }
 </ul>

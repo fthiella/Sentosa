@@ -3,3 +3,5 @@ data/
 # don't sync log files
 logs/
 logs/poet.log.ERROR
+sqlite3.exe
+db/sentosa.custom.sql

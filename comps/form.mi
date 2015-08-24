@@ -41,7 +41,7 @@
 %  # provides link from some form fields to some table fields
 %  $data_link =~ /^q\.(.+)=f\.(.+)$/;
 %  my $table_link = "data-from-form=\"".$.form->{id}."\" data-from-field=\"$2\" data-to-table=\"$id\" data-to-field=\"$1\"";
-<& query.mc, _id => $id, authenticated_user=>$.authenticated_user, table_link=>$table_link, hide_title => 1, hide_top => 1, hide_bottom => 0 &>
+<& query.mc, _id => $id, table_link=>$table_link, hide_title => 1, hide_top => 1, hide_bottom => 0 &>
 </%method>
 
 

@@ -84,9 +84,9 @@ has 'title';
               <& widgets/dropdown_tasks.mc &>
               <& widgets/dropdown_messages.mc &>
               <& widgets/dropdown_alerts.mc &>
-              <& widgets/dropdown_user.mi, user=>Sentosa::Users::get_userinfo($.authenticated_user) || 'Guest' &>
+              <& widgets/dropdown_user.mi &>
             </ul>
-            <& /widgets/sidebar.mc, authenticated_user => $.authenticated_user &>
+            <& /widgets/sidebar.mc &>
 
             <!-- /.navbar-static-side -->
         </nav>

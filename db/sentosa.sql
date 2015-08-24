@@ -12,14 +12,6 @@ create table if not exists af_info (
 insert into af_info (attribute, value) values
 ('name', 'Sentosa AutoForms'),
 ('version', '0.01');
-
--- af_sessions: session management server-side
-
-create table if not exists af_sessions (
- id integer primary key autoincrement,
- auth_user_id integer,
- auth_ts timestamp default CURRENT_TIMESTAMP
-);
  
 -- --------------------------------------------------------
 -- Configuration Tables

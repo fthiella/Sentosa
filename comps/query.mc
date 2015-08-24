@@ -8,10 +8,10 @@
 <%init>
   use Sentosa::Objects;
   
-  my ($select) = Sentosa::Objects::get_object($._id, 'query', $.authenticated_user);
+  my ($select) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
   if (!$select) { $m->not_found(); }; # query not found
   
-  my ($conn) = Sentosa::Objects::get_queryconnection($._id, $.authenticated_user);
+  my ($conn) = Sentosa::Objects::get_queryconnection($._id, $m->session->{auth_id});
   if (!$conn) {
     # connection not found - object does not exist, or user is not allowed, or user is not authenticated
     $m->not_found();
@@ -19,7 +19,7 @@
 
   my $db = DBI->connect($conn->{db}, $conn->{username}, $conn->{password}) or die("connection to ".$conn->{db}." error.\n");
   
-  my (@columns) = Sentosa::Objects::get_querycolumns($._id, $.authenticated_user);
+  my (@columns) = Sentosa::Objects::get_querycolumns($._id, $m->session->{auth_id});
   # TODO: always quote all identifiers, on every component not just here ^_^
   my @fields = map { $_->{col} } @columns;
 </%init>

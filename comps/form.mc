@@ -27,17 +27,17 @@ Example:
 </%class>
 <%init>
   use Sentosa::Objects;
-  my ($form) = Sentosa::Objects::get_object($._id, 'form', $.authenticated_user);
+  my ($form) = Sentosa::Objects::get_object($._id, 'form', $m->session->{auth_id});
   if (!$form) { $m->not_found(); }; # form not found
   
   my @boxes;
 
-  foreach my $box (Sentosa::Objects::get_formboxes($form->{id}, $.authenticated_user)) {
+  foreach my $box (Sentosa::Objects::get_formboxes($form->{id}, $m->session->{auth_id})) {
     my @box_elements;
-    foreach my $element (Sentosa::Objects::get_formelements($form->{id}, $box->{box}, $.authenticated_user)) {
+    foreach my $element (Sentosa::Objects::get_formelements($form->{id}, $box->{box}, $m->session->{auth_id})) {
       push @box_elements, {caption=>$element->{caption}, col=>$element->{col}, type=>$element->{type}, params=>$element->{params}};
     }
     push @boxes, {name=>$box->{box}, elements=>\@box_elements};
   }
 </%init>
-<& form.mi, form=>{id=>$form->{id}, description=>$form->{description}, boxes=>\@boxes}, authenticated_user=>$.authenticated_user &>
+<& form.mi, form=>{id=>$form->{id}, description=>$form->{description}, boxes=>\@boxes} &>

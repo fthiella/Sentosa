@@ -30,8 +30,8 @@
   use Sentosa::Utils;
   
   # logout
-  $.authenticated_user(undef);
   $m->session->{auth_id} = undef;
+  $m->req->{env}->{'psgix.session.options'}->{expires} = 0;
 
   $.title(Sentosa::Utils::get_appinfo);
 </%init>
