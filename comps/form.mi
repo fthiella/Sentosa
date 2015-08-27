@@ -28,7 +28,6 @@
 </div>
 </%method>
 
-
 <%method input_file ($id, $caption)><p><% $caption %>:</p>
 <p><input type="file" id="<% $id %>" name="<% $id %>" /></p>
 
@@ -36,11 +35,15 @@
 <div id="<% $id %>_bar"></div><div id="<% $id %>_percent">0%</div>
 </%method>
 
-
 <%method query ($id, $caption, $data_link, $hide_title, $hide_top, $hide_bottom) >
 %  # provides link from some form fields to some table fields
 %  $data_link =~ /^q\.(.+)=f\.(.+)$/;
-%  my $table_link = "data-from-form=\"".$.form->{id}."\" data-from-field=\"$2\" data-to-table=\"$id\" data-to-field=\"$1\"";
+%  my $table_link = {
+%    from_form => $.form->{id},
+%    from_field => $2,
+%    to_table => $id,
+%    to_field => $1,
+%  };
 <& query.mc, _id => $id, table_link=>$table_link, hide_title => 1, hide_top => 1, hide_bottom => 0 &>
 </%method>
 
@@ -75,7 +78,7 @@
 <form id="<% $.form->{id} %>" action="db?_id=<% $.form->{id} %>" method="post" enctype="multipart/form-data" class='form-horizontal form-bordered'>
 % # TODO: give a unique name to is_dirty
   <input type="hidden" id="is_dirty" name="<% $.form->{id} %>_is_dirty" value="0" />
-  <input type="hidden" id="<% $.form->{id} %>_goto_record" name="goto_record" value="<% $.form->{record} %>" />
+  <input type="hidden" id="goto_record" name="goto_record" value="<% $.form->{record} %>" />
 
 % # TODO: is order of boxes guaranteed?
 % foreach my $box (@{ $.form->{boxes} }) {  

@@ -5,53 +5,43 @@ $(document).ready(function()
   /* ************** */
   /* form functions */
   /* ************** */
-  function actions(form, action) {    
-    /* TODO: if is_dirty=1 then try to save the current record first, if save succedes then proceed with the action */
-    /* recursion? but we need to be careful as code has to be asyncronous! */
+  function actions(form, action1, action2) {
 
-    switch (action) {
+    switch (action1) {
       case "save":
-      case "insert":
-        // if it's insert and is dirty=0 then skip saving
-        if (!((action==="insert") && ($('#' + form + ' input#is_dirty').val()!=="1"))) {
-          $.getJSON('db', '_id=' + form + '&button=save&' + $('#' + form).serialize(), function(res) {
-            if (res["_status"] === "OK") { // TODO: is this really a good idea?
-              $('#' + form + ' input#is_dirty').val('');
-              
-              if (action==="insert") {
-                for (index = 0; index < fields[form].length; ++index) {
-                  $('#' + form + ' input#'+fields[form][index]).val('');
-                }
-              }
+        if ($("#is_dirty", form).val()=="1") {
+          /* SAVE */
+          $.getJSON('db', '_id=' + form.attr("id") + '&button=save&' + $('.form-control', form).serialize(), function(res) {
+            if (res["_status"] === "OK") {
+              $('input#is_dirty', form).val('');
+              /* proceed with next action */
+              actions(form, action2, undefined);
+            } else {
+              alert("Couldn't save current record");
             }
           });
+        } else {
+          actions(form, action2, undefined);
         }
-        // if it's insert and dirty is now=0 then blank the form
-        if ((action==="insert") && ($('#' + form + ' input#is_dirty').val()!="1")) {
-          for (index = 0; index < fields[form].length; ++index) {
-            $('#' + form + ' input#'+fields[form][index]).val('');
-          }
-        }
+        break;
+      case "insert":
+        
+        $(".form-control", form).each( function (n) {
+          this.value="";
+        });
         break;
       default:
         /* TODO: check is_dirty first! and is_dirty will have a unique name */
         $.getJSON(
           'db',
-          '_id=' + form + '&' +
-          'button=' + action + '&' +
-          $('#' + form + ' input#id').serialize()+ '&' +
-          $('input#' + form + '_goto_record').serialize(),
+          '_id=' + form.attr("id") + '&' +
+          'button=' + action1 + '&' +
+          $('input#id', form).serialize()+ '&' +
           function( res ) {
-            $.each( res, function( key, val ) {
-              fields[key] = val;
-              $('#' + form + ' input#'+key).val(val);
-              
-              /* force a change whenever a field linked to a table is changed */
-              /* TODO: linked fields, make it simpler/clearer/better/more performant? */
-              if ($('#' + form + ' input#' + key).data('to-table')) {
-                $('#' + form + ' input#' + key).change();
-              }
-            })
+            $.each( res, function( key, val ) { /* TODO: disable is_dirty, and don't always call change! */
+              $('input#'+key, form).val(val).change();
+            });
+            $("#is_dirty", form).val(0);
           }
         )
     }
@@ -59,35 +49,23 @@ $(document).ready(function()
 
   function init_form(form) {
       /* buttons management */
-      $('#' + form + ' button#save').click(function()      { actions(form, 'save'); });
-      $('#' + form + ' button#gotofirst').click(function() { actions(form, 'primo'); });
-      $('#' + form + ' button#indietro').click(function()  { actions(form, 'indietro'); });
-      $('#' + form + ' button#avanti').click(function()    { actions(form, 'avanti'); });
-      $('#' + form + ' button#ultimo').click(function()    { actions(form, 'ultimo'); });
-      $('#' + form + ' button#insert').click(function()    { actions(form, 'insert'); });
+      $('button#save', form).click(function()      { actions(form, 'save', undefined); });
+      $('button#gotofirst', form).click(function() { actions(form, 'save', 'primo'); });
+      $('button#indietro', form).click(function()  { actions(form, 'save', 'indietro'); });
+      $('button#avanti', form).click(function()    { actions(form, 'save', 'avanti'); });
+      $('button#ultimo', form).click(function()    { actions(form, 'save', 'ultimo'); });
+      $('button#insert', form).click(function()    { actions(form, 'save', 'insert'); });
+      /* TODO: undo, and delete! */
 
       /* GOTO_RECORD on Change */
-      $('#' + form + ' input#goto_record').change(function() {
+      $('input#goto_record', form).change(function() {
         actions(form, 'primo');
       });
-      
-      /* TODO: improve link between form and subquery */
-      $("#" + form).find('input').each(function( n ) {
-        if ($(this).data('to-table')) {
-          var to_field = "input[name="+ $(this).data('to-table') + "_search_" + $(this).data('to-field') +"]";
-          var from_field = '#' + $(this).data('from-form') + ' input#' + $(this).data('from-field');
-          
-          $(from_field).change(function() {
-            $(to_field).val( $(from_field).val() );
-            $(to_field).trigger('keyup');
-          })
-        }
-      });
-  
+
       /* CHANGE EDIT DATA */
-      $('#' + form).change(function() {
-        /* intercepts a change on the current form, and sets is_dirty to true */
-        $("#is_dirty").val(1);
+      form.change(function() {
+        /* intercepts a edit/change on the current form, and sets is_dirty to true */
+        $("#is_dirty", form).val(1);
       }); 
 
       /* go to the first record, or to the goto_record if specified */
@@ -95,16 +73,24 @@ $(document).ready(function()
   }
 
   var fields = new Array();
-  // fields['names'] = ["id","name","city"];
 
-  /* ******************** */
-  /* Datatables functions */
-  /* ******************** */
-  function init_table(table, ajax_source) {
-    var oTable = $('#' + table).dataTable( {
+  /* ****************** */
+  /* *** INITIALIZE *** */
+  /* ****************** */
+
+  /* loop and initialize each form in the page */
+
+  $("form").each(function( n ) {
+    init_form($(this));
+  });
+
+  /* NEW FUNCTIONS */
+
+  function init_table(table) {
+    var oTable = table.dataTable( {
       "bProcessing": true,
       "bServerSide": true,
-      "sAjaxSource": ajax_source,
+      "sAjaxSource": table.attr("data-ajax-source"),
   
       "oLanguage": {
         "sLengthMenu":   "Mostra _MENU_ righe per pagina",
@@ -115,67 +101,46 @@ $(document).ready(function()
         "sSearch":       "Cerca:"
       }
     } );
-  
-    $("#" + table + " tfoot input").keyup( function () {
+
+    /* links form fields to table fields. Use a plugin like fieldsyc? */
+    $("tfoot input[data-from-form]", table).each( function (n) {
+      var to_field = $(this);
+
+      $("#" + $(this).attr("data-from-form") + " input#" + $(this).attr("data-from-field")).change(function(n) {
+        to_field.val($(this).val());
+        to_field.trigger('keyup');
+      })
+    });
+
+    $("tfoot input", table).keyup( function () {
       /* Filter on the column (the index) of this element */
-      oTable.fnFilter( this.value, $("#" + table + " tfoot input").index(this) );
+      oTable.fnFilter( this.value, $("tfoot input", table).index(this) );
     } );
-    
+
     /*
      * Support functions to provide a little bit of 'user friendlyness' to the textboxes in
      * the footer
      */
-    $("#" + table + " tfoot input").each( function (i) {
-      asInitVals[i] = this.value;
-    } );
-  
-    $("#" + table + " tfoot input").focus( function () {
-      if ( this.className == table + "_search_init" )
+    $("tfoot input", table).focus( function () {
+      if ( this.className == "search_init" )
       {
         this.className = "";
         this.value = "";
       }
     } );
-  
-    $("#" + table + " tfoot input").blur( function (i) {
+
+    $("tfoot input", table).blur( function (i) {
       if ( this.value == "" )
       {
-        this.className = table + "_search_init";
-        this.value = asInitVals[$("#" + table + " tfoot input").index(this)];
+        this.className = table + "search_init";
+        this.value = $(this).attr('data-value');
       }
     } );
   }
-  
-  /* ****************** */
-  /* *** INITIALIZE *** */
-  /* ****************** */
-  
-  /* connect form with subquery */
-  /* TODO: need to improve! */
-  
-  $("table" ).each(function( n ) {
-    if ($(this).attr('data-from-form')) {
-      $('#' + $(this).attr('data-from-form') + ' #' + $(this).attr('data-from-field')).data('from-form', $(this).attr('data-from-form') );
-      $('#' + $(this).attr('data-from-form') + ' #' + $(this).attr('data-from-field')).data('from-field', $(this).attr('data-from-field') );
-      $('#' + $(this).attr('data-from-form') + ' #' + $(this).attr('data-from-field')).data('to-table', $(this).attr('data-to-table') );
-      $('#' + $(this).attr('data-from-form') + ' #' + $(this).attr('data-from-field')).data('to-field', $(this).attr('data-to-field') );
-    }
-  });
 
-  /* iterate through each form */
-
-  $("form" ).each(function( n ) {
-    /* loop and initialize each form in the page */
-    init_form( $(this).attr('id') );
-  });
-
-  /* iterate through each table */
-
-  $("table" ).each(function( n ) {
-    /* loop and initialize each form in the page */
-    if ($(this).attr('data-ajax-source')) {
-      init_table($(this).attr('id'), $(this).attr('data-ajax-source'));
-    }
+  /* initialize all tables */
+  $('table[data-ajax-source]').each(function (n) {
+    init_table($(this));
   });
 
 });

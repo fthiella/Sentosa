@@ -16,8 +16,8 @@ method wrap() {
     my $auth_id = Sentosa::Users::auth_user( $._username, $._password );
 
     if (defined $auth_id) {
+      $m->req->{env}->{'psgix.session.options'}->{change_id} = 1;
       $m->session->{auth_id} = $auth_id;
-      $m->req->{env}->{'psgix.session.options'}->{expires} = "+1h";
     } else {
       $m->session->{auth_id} = undef;
       # $m->req->{env}->{'psgix.session.options'}->{expires} = 0;

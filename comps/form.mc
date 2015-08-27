@@ -40,4 +40,4 @@ Example:
     push @boxes, {name=>$box->{box}, elements=>\@box_elements};
   }
 </%init>
-<& form.mi, form=>{id=>$form->{id}, description=>$form->{description}, boxes=>\@boxes} &>
+<& form.mi, form=>{id=>$form->{id}, description=>$form->{description}, record=>$._record, boxes=>\@boxes} &>
