@@ -11,7 +11,7 @@ $(document).ready(function()
       case "save":
         if ($("#is_dirty", form).val()=="1") {
           /* SAVE */
-          $.getJSON('db', '_id=' + form.attr("id") + '&button=save&' + $('.form-control', form).serialize(), function(res) {
+          $.getJSON(form.attr('action'), 'button=save&' + $('.form-control', form).serialize(), function(res) {
             if (res["_status"] === "OK") {
               $('input#is_dirty', form).val('');
               /* proceed with next action */
@@ -33,8 +33,7 @@ $(document).ready(function()
       default:
         /* TODO: check is_dirty first! and is_dirty will have a unique name */
         $.getJSON(
-          'db',
-          '_id=' + form.attr("id") + '&' +
+          form.attr('action'),
           'button=' + action1 + '&' +
           $('input#id', form).serialize()+ '&' +
           $('input#goto_record', form).serialize(),

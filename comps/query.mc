@@ -43,7 +43,7 @@
   <tr>
 % foreach my $col (@fields) {
 %   my $data_link;
-%   if ($col eq $.table_link->{to_field}) {
+%   if (($.table_link) && ($col eq $.table_link->{to_field})) {
 %     $data_link = 'data-from-form="'. $.table_link->{from_form} .'" data-from-field="'. $.table_link->{from_field} .'"';
 %   } else {
 %     $data_link = "";
