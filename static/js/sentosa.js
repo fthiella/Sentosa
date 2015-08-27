@@ -37,6 +37,7 @@ $(document).ready(function()
           '_id=' + form.attr("id") + '&' +
           'button=' + action1 + '&' +
           $('input#id', form).serialize()+ '&' +
+          $('input#goto_record', form).serialize(),
           function( res ) {
             $.each( res, function( key, val ) { /* TODO: disable is_dirty, and don't always call change! */
               $('input#'+key, form).val(val).change();
