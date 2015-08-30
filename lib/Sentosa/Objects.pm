@@ -8,8 +8,10 @@ sub get_object {
   my ($id, $objecttype, $userid) = @_;
 
   my $ar = $dbh->selectall_arrayref(
-    "SELECT o.id, o.name, o.source, o.description
-    FROM af_objects o
+    "SELECT o.id, o.name, o.source, o.description, o.def, o.pk, c.db, c.username, c.password
+    FROM
+      af_objects o LEFT JOIN af_connections c
+      ON o.id_connection = c.id
     WHERE
       o.id=? AND o.type=?
       AND
@@ -36,7 +38,7 @@ sub get_object {
  return @{ $ar };
 }
 
-sub get_objectsdetails {
+sub get_objectlist {
   my ($userid, $objecttype) = @_;
   my $ar = $dbh->selectall_arrayref(
     "SELECT o.id, o.name, o.source, o.description

@@ -100,21 +100,209 @@ create table af_objects (
   source string,
   pk string,
   description varchar(45),
+  def text,
   FOREIGN KEY(id_app) REFERENCES af_apps(id),
   FOREIGN KEY(id_connection) REFERENCES af_connections(id)
 );
 
 insert into af_objects values
 -- management
-(1, 1, 'form',  'Users',       1, 'af_users',    'id', 'Users Form'),
-(2, 1, 'form',  'Groups',      1, 'af_groups',   'id', 'Groups Form'),
-(3, 1, 'query', 'Users',       1, 'af_users',    'id', 'Users List'),
-(4, 1, 'query', 'Groups',      1, 'af_groups',   'id', 'Groups List'),
+(1, 1, 'form',  'Users',       1, 'af_users',    'id', 'Users Form',
+'[
+{
+  "name": "box1",
+  "elements": [{
+    "col": "id",
+    "params": null,
+    "caption": "id",
+    "type": "hidden"
+  }]
+},
+{
+  "name": "box2",
+  "elements": [{
+    "col": "username",
+    "params": null,
+    "caption": "User Name",
+    "type": "text"
+  },
+  {
+    "col": "password",
+    "params": null,
+    "caption": "Password",
+    "type": "text"
+  }]
+}
+]'),
+
+(2, 1, 'form',  'Groups',      1, 'af_groups',   'id', 'Groups Form',
+'[
+{
+  "name": "box1",
+  "elements": [{
+    "col": "id",
+    "params": null,
+    "caption": "id",
+    "type": "hidden"
+  }]
+},
+{
+  "name": "box2",
+  "elements": [{
+    "col": "groupname",
+    "params": null,
+    "caption": "Group Name",
+    "type": "text"
+  }]
+}
+]'),
+
+(3, 1, 'query', 'Users',       1, 'af_users',    'id', 'Users List',  NULL),
+(4, 1, 'query', 'Groups',      1, 'af_groups',   'id', 'Groups List', NULL),
 -- sample app
-(5, 2, 'form',  'Gardens',     2, 'gardens',     'id', 'Gardens Form'),
-(6, 2, 'form',  'Attractions', 2, 'attractions', 'id', 'Attractions Form'),
-(7, 2, 'query', 'Gardens',     2, 'gardens',     'id', 'Gardens List'),
-(8, 2, 'query', 'Attractions', 2, 'attractions', 'id', 'Attractions List');
+(5, 2, 'form',  'Gardens',     2, 'gardens',     'id', 'Gardens Form',
+'[
+{
+  "name": "box1",
+  "elements": [{
+    "col": "id",
+    "params": null,
+    "caption": "id",
+    "type": "hidden"
+  }]
+},
+{
+  "name": "box2",
+  "elements": [{
+    "col": "name",
+    "params": null,
+    "caption": "Garden Name",
+    "type": "text"
+  },
+  {
+    "col": "city",
+    "params": null,
+    "caption": "City",
+    "type": "text"
+  }]
+},
+{
+  "name": "box3",
+  "elements": [{
+    "col": "8",
+    "params": "q.id_garden=f.id",
+    "caption": "Attractions",
+    "type": "query"
+  }]
+}
+]'),
+
+(6, 2, 'form',  'Attractions', 2, 'attractions', 'id', 'Attractions Form',
+'[
+{
+  "name": "box1",
+  "elements": [{
+    "col": "id",
+    "params": null,
+    "caption": "id",
+    "type": "hidden"
+  }]
+},
+{
+  "name": "box2",
+  "elements": [{
+    "col": "id_garden",
+    "params": null,
+    "caption": "id_garden",
+    "type": "text"
+  },
+  {
+    "col": "attraction",
+    "params": null,
+    "caption": "Flower Name",
+    "type": "text"
+  }]
+}
+]'),
+
+(7, 2, 'query', 'Gardens',     2, 'gardens',     'id', 'Gardens List', NULL),
+(8, 2, 'query', 'Attractions', 2, 'attractions', 'id', 'Attractions List', NULL),
+
+(9, 1, 'form',  'Objects',     1, 'af_objects',  'id', 'Sentosa Objects',
+'[
+{
+  "name": "box1",
+  "elements": [{
+    "col": "id",
+    "params": null,
+    "caption": "id",
+    "type": "hidden"
+  }]
+},
+
+{
+  "name": "box2",
+  "elements": [{
+    "col": "id_app",
+    "params": null,
+    "caption": "Application",
+    "type": "text"
+  },
+  {
+    "col": "type",
+    "params": null,
+    "caption": "Type",
+    "type": "text"
+  },
+  {
+    "col": "name",
+    "params": null,
+    "caption": "Name",
+    "type": "text"
+  },
+  {
+    "col": "id_connection",
+    "params": null,
+    "caption": "Connection",
+    "type": "text"
+  },
+  {
+    "col": "source",
+    "params": null,
+    "caption": "Source",
+    "type": "text"
+  },
+  {
+    "col": "pk",
+    "params": null,
+    "caption": "Primary Key",
+    "type": "text"
+  }]
+},
+
+
+{
+  "name": "box3",
+  "elements": [{
+    "col": "description",
+    "params": null,
+    "caption": "Description",
+    "type": "text"
+  }]
+},
+
+{
+  "name": "box4",
+  "elements": [{
+    "col": "def",
+    "params": null,
+    "caption": "Definition",
+    "type": "text"
+  }]
+}
+
+]'
+);
 
 create table af_forms (
   id integer primary key autoincrement,

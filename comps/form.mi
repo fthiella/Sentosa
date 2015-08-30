@@ -19,6 +19,14 @@
     </div>
 </%method>
 
+<%method input_textarea ($id, $caption, $value)>
+    <label for="<% $id %>" class="control-label col-sm-2"><% $caption | HTMLEntities %></label>
+    <div class="col-sm-10">
+      <textarea id="<% $id %>" name="<% $id %>" class="form-control">
+<% $value %>
+      </textarea>
+    </div>
+</%method>
 
 <%method input_checkbox ($id, $caption, $value)>    <div class="checkbox">
 	<label>
@@ -89,6 +97,7 @@
 			given ($element->{type}) {
 				when ('hidden')   { print $.input_hidden($element->{col}, $element->{caption}); }
         when ('text')     { print $.input_text($element->{col}, $element->{caption}, ''); }
+        when ('textarea') { print $.input_textarea($element->{col}, $element->{caption}, ''); }
         when ('checkbox') { print $.input_checkbox($element->{col}, $element->{caption}, ''); }
         when ('file')			{ print $.input_file($element->{col}, $element->{caption}, ''); }
 				when ('query')    { print $.query($element->{col}, $element->{caption}, $element->{params}, '1', '1', '1'); }

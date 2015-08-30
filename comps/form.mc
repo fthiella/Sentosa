@@ -26,18 +26,20 @@ Example:
 	has '_record' => (default => '');
 </%class>
 <%init>
+  use JSON ();
   use Sentosa::Objects;
+
   my ($form) = Sentosa::Objects::get_object($._id, 'form', $m->session->{auth_id});
   if (!$form) { $m->not_found(); }; # form not found
   
-  my @boxes;
-
-  foreach my $box (Sentosa::Objects::get_formboxes($form->{id}, $m->session->{auth_id})) {
-    my @box_elements;
-    foreach my $element (Sentosa::Objects::get_formelements($form->{id}, $box->{box}, $m->session->{auth_id})) {
-      push @box_elements, {caption=>$element->{caption}, col=>$element->{col}, type=>$element->{type}, params=>$element->{params}};
-    }
-    push @boxes, {name=>$box->{box}, elements=>\@box_elements};
-  }
+  my @boxes = JSON->new->utf8->decode($form->{def});
 </%init>
-<& form.mi, form=>{id=>$form->{id}, description=>$form->{description}, record=>$._record, boxes=>\@boxes} &>
+<&
+  form.mi,
+    form => {
+      id => $form->{id},
+      description => $form->{description},
+      record => $._record,
+      boxes => @boxes
+    }
+&>

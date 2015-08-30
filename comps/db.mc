@@ -11,23 +11,23 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
 <%init>
   use feature qw( switch );
   use Poet qw($log);
+  use JSON ();
   use Sentosa::Objects;
-
-  my ($conn) = Sentosa::Objects::get_formconnection($._id, $m->session->{auth_id});
-
-  if (!$conn) {
-    # connection not found - object does not exist, or user is not allowed, or user is not authenticated
-    $m->not_found();
-  };
   
+  my ($form) = Sentosa::Objects::get_object($._id, 'form', $m->session->{auth_id});
+  if (!$form) { $m->not_found(); }; # form not found
+  
+  my $boxes = JSON->new->utf8->decode($form->{def});
+
   # create $db connection to the database referred to the form (Apache::DBI should take care of not creating the same connection again)
 
-  my $db = DBI->connect($conn->{db}, $conn->{username}, $conn->{password}) or die("connection to ".$conn->{db}." error.\n");
+  my $db = DBI->connect($form->{db}, $form->{username}, $form->{password}) or die("connection to ".$form->{db}." error.\n");
   my $sth;
   # TODO: what if the primary key is not a single field?
-  my $pk = $.args->{ $conn->{pk} };
+  my $pk = $.args->{ $form->{pk} };
 
-  my @all_columns = Sentosa::Objects::get_formcolumns($._id, $m->session->{auth_id});
+  my @all_columns = map { @{$_->{elements}} } @{$boxes};
+
   my $csv_columns = join(',', map { $_->{col} } @all_columns);
   dc($csv_columns);
 
@@ -37,7 +37,7 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
   
   foreach my $col (@all_columns) {
     # TODO: primary key is not always a single field
-    unless ($col->{col} eq $conn->{pk}) {
+    unless ($col->{col} eq $form->{pk}) {
       push @columns, $col->{col};
       push @values, $.args->{ $col->{col} };
     }
@@ -54,10 +54,10 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
     
       if ($pk ne '') {
         push @values, $pk;
-        $query='UPDATE '.$conn->{source}.' SET '.join('=?,', @columns).'=? WHERE '.$conn->{pk}.'=?';
+        $query='UPDATE '.$form->{source}.' SET '.join('=?,', @columns).'=? WHERE '.$form->{pk}.'=?';
         @params=@values;
       } else {
-        $query='INSERT INTO '.$conn->{source}.' ('.join(',', @columns).') VALUES ('.substr('?,'x scalar @values, 0, -1).')';
+        $query='INSERT INTO '.$form->{source}.' ('.join(',', @columns).') VALUES ('.substr('?,'x scalar @values, 0, -1).')';
         @params=@values;
       }
 
@@ -65,30 +65,30 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
 
     when ('primo') {
       if ($.args->{'goto_record'} ne '') {
-        $query='SELECT '.$csv_columns.' FROM '.$conn->{source}.' WHERE '.$conn->{pk}.'=? ORDER BY '.$conn->{pk}.' LIMIT 1';
+        $query='SELECT '.$csv_columns.' FROM '.$form->{source}.' WHERE '.$form->{pk}.'=? ORDER BY '.$form->{pk}.' LIMIT 1';
         push @params, $.args->{'goto_record'};
       } else {
-        $query='SELECT '.$csv_columns.' FROM '.$conn->{source}.' ORDER BY '.$conn->{pk}.' LIMIT 1';
+        $query='SELECT '.$csv_columns.' FROM '.$form->{source}.' ORDER BY '.$form->{pk}.' LIMIT 1';
       }
     }
     when ('ultimo') {
-      $query='SELECT '.$csv_columns.' FROM '.$conn->{source}.' ORDER BY '.$conn->{pk}.' DESC LIMIT 1';
+      $query='SELECT '.$csv_columns.' FROM '.$form->{source}.' ORDER BY '.$form->{pk}.' DESC LIMIT 1';
     }
     when ('indietro') {
       # se nullo vai all'ultimo
       if ($pk eq '') {
-        $query='SELECT '.$csv_columns.' FROM '.$conn->{source}.' ORDER BY '.$conn->{pk}.' DESC LIMIT 1';
+        $query='SELECT '.$csv_columns.' FROM '.$form->{source}.' ORDER BY '.$form->{pk}.' DESC LIMIT 1';
       } else {
-        $query='SELECT '.$csv_columns.' FROM '.$conn->{source}.' WHERE '.$conn->{pk}.'<? ORDER BY '.$conn->{pk}.' DESC LIMIT 1';
+        $query='SELECT '.$csv_columns.' FROM '.$form->{source}.' WHERE '.$form->{pk}.'<? ORDER BY '.$form->{pk}.' DESC LIMIT 1';
         push @params, $pk;
       }
     }
     when ('avanti') {
       # se id nullo vai all'ultimo
       if ($pk eq '') {
-        $query='SELECT '.$csv_columns.' FROM '.$conn->{source}.' ORDER BY '.$conn->{pk}.' DESC LIMIT 1';
+        $query='SELECT '.$csv_columns.' FROM '.$form->{source}.' ORDER BY '.$form->{pk}.' DESC LIMIT 1';
       } else {
-        $query='SELECT '.$csv_columns.' FROM '.$conn->{source}.' WHERE '.$conn->{pk}.'>? ORDER BY '.$conn->{pk}.' LIMIT 1';
+        $query='SELECT '.$csv_columns.' FROM '.$form->{source}.' WHERE '.$form->{pk}.'>? ORDER BY '.$form->{pk}.' LIMIT 1';
         push @params, $pk;
       }
     }
@@ -102,7 +102,7 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
     my $values = $sth->fetchrow_hashref();
     $sth->finish();
 
-    if ($$values{ $conn->{pk}} ) { # pk is defined so the query succeeded
+    if ($$values{ $form->{pk}} ) { # pk is defined so the query succeeded
       foreach my $col (@all_columns) {
         $h{ $col->{col} } = $$values{ $col->{col} };
       }
