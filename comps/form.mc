@@ -40,6 +40,7 @@ Example:
       id => $form->{id},
       description => $form->{description},
       record => $._record,
+	  pk => $form->{pk},
       boxes => @boxes
     }
 &>

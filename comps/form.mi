@@ -83,12 +83,11 @@
 							<div class="box-content nopadding">
 
 % # TODO: use Poet function to create URL?
-<form id="<% $.form->{id} %>" action="db?_id=<% $.form->{id} %>" method="post" enctype="multipart/form-data" class='form-horizontal form-bordered'>
+<form id="<% $.form->{id} %>" action="db?_id=<% $.form->{id} %>" method="post" enctype="multipart/form-data" class='form-horizontal form-bordered' data-pk="<% $.form->{pk} %>">
 % # TODO: give a unique name to is_dirty
   <input type="hidden" id="is_dirty" name="<% $.form->{id} %>_is_dirty" value="0" />
   <input type="hidden" id="goto_record" name="goto_record" value="<% $.form->{record} %>" />
-
-% # TODO: is order of boxes guaranteed?
+% # TODO: is order of boxes guaranteed? sort by box name?
 % foreach my $box (@{ $.form->{boxes} }) {  
 <div id="<% $.form->{id} %>_<% $box->{name} %>" class="form-group">
 

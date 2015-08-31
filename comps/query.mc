@@ -30,7 +30,7 @@
 </thead>
 <tbody>
   <tr>
-    <td colspan="6" class="dataTables_empty">Loading data from server</td>
+    <td colspan="<% scalar @{$columns} %>" class="dataTables_empty">Loading data from server</td>
   </tr>
   </tbody>
 <tfoot>

@@ -31,11 +31,15 @@ $(document).ready(function()
         });
         break;
       default:
+        var pk_ser = '';
+        form.attr('data-pk').split(",").forEach(function (item) {
+          pk_ser = pk_ser + $('input#' + item, form).serialize()+ '&';
+        });
         /* TODO: check is_dirty first! and is_dirty will have a unique name */
         $.getJSON(
           form.attr('action'),
           'button=' + action1 + '&' +
-          $('input#id', form).serialize()+ '&' +
+          pk_ser +
           $('input#goto_record', form).serialize(),
           function( res ) {
             $.each( res, function( key, val ) { /* TODO: disable is_dirty, and don't always call change! */
