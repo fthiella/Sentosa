@@ -107,253 +107,132 @@ create table af_objects (
 
 insert into af_objects values
 -- management
-(1, 1, 'form',  'Users',       1, 'af_users',    'id', 'Users Form',
+(1, 1, 'form', 'Users', 1, 'af_users', 'id', 'Users Form',
 '[
-{
-  "name": "box1",
-  "elements": [{
-    "col": "id",
-    "params": null,
-    "caption": "id",
-    "type": "hidden"
-  }]
-},
-{
-  "name": "box2",
-  "elements": [{
-    "col": "username",
-    "params": null,
-    "caption": "User Name",
-    "type": "text"
+  {
+    "name": "box1", "elements":
+    [{"col": "id", "params": null, "caption": "id", "type": "hidden"}]
   },
   {
-    "col": "password",
-    "params": null,
-    "caption": "Password",
-    "type": "text"
-  }]
-}
+    "name": "box2", "elements":
+    [
+      {"col": "username", "params": null, "caption": "User Name", "type": "text" },
+      {"col": "password", "params": null, "caption": "Password", "type": "text" }
+    ]
+  }
 ]'),
 
-(2, 1, 'form',  'Groups',      1, 'af_groups',   'id', 'Groups Form',
+(2, 1, 'form', 'Groups', 1, 'af_groups', 'id', 'Groups Form',
 '[
-{
-  "name": "box1",
-  "elements": [{
-    "col": "id",
-    "params": null,
-    "caption": "id",
-    "type": "hidden"
-  }]
-},
-{
-  "name": "box2",
-  "elements": [{
-    "col": "groupname",
-    "params": null,
-    "caption": "Group Name",
-    "type": "text"
-  }]
-}
+  {
+    "name": "box1",
+    "elements":
+      [{"col": "id", "params": null, "caption": "id", "type": "hidden"}]
+  },
+  {
+    "name": "box2",
+    "elements":
+      [{"col": "groupname", "params": null, "caption": "Group Name", "type": "text" }]
+  }
 ]'),
 
-(3, 1, 'query', 'Users',       1, 'af_users',    'id', 'Users List',  NULL),
-(4, 1, 'query', 'Groups',      1, 'af_groups',   'id', 'Groups List', NULL),
+(3, 1, 'query', 'Users', 1, 'af_users', 'id', 'Users List',
+'[
+  {"col": "id", "caption": "id"},
+  {"col": "username", "caption": "Username"},
+  {"col": "password", "caption": "Password"}
+]'),
+
+(4, 1, 'query', 'Groups', 1, 'af_groups', 'id', 'Groups List',
+'[
+  {"col": "id", "caption": "id"},
+  {"col": "groupname", "caption": "Groupname"}
+]'),
 -- sample app
-(5, 2, 'form',  'Gardens',     2, 'gardens',     'id', 'Gardens Form',
+
+(5, 2, 'form', 'Gardens', 2, 'gardens', 'id', 'Gardens Form',
 '[
-{
-  "name": "box1",
-  "elements": [{
-    "col": "id",
-    "params": null,
-    "caption": "id",
-    "type": "hidden"
-  }]
-},
-{
-  "name": "box2",
-  "elements": [{
-    "col": "name",
-    "params": null,
-    "caption": "Garden Name",
-    "type": "text"
+  {
+    "name": "box1",
+    "elements":
+      [{"col": "id", "params": null, "caption": "id", "type": "hidden"}]
   },
   {
-    "col": "city",
-    "params": null,
-    "caption": "City",
-    "type": "text"
-  }]
-},
-{
-  "name": "box3",
-  "elements": [{
-    "col": "8",
-    "params": "q.id_garden=f.id",
-    "caption": "Attractions",
-    "type": "query"
-  }]
-}
+    "name": "box2",
+    "elements":
+      [
+        {"col": "name", "params": null, "caption": "Garden Name", "type": "text"},
+        {"col": "city", "params": null, "caption": "City", "type": "text"}
+      ]
+  },
+  {
+    "name": "box3",
+    "elements":
+      [
+        {"col": "8", "params": "q.id_garden=f.id", "caption": "Attractions", "type": "query"}
+      ]
+  }
 ]'),
 
 (6, 2, 'form',  'Attractions', 2, 'attractions', 'id', 'Attractions Form',
 '[
-{
-  "name": "box1",
-  "elements": [{
-    "col": "id",
-    "params": null,
-    "caption": "id",
-    "type": "hidden"
-  }]
-},
-{
-  "name": "box2",
-  "elements": [{
-    "col": "id_garden",
-    "params": null,
-    "caption": "id_garden",
-    "type": "text"
+  {
+    "name": "box1",
+    "elements":
+      [{"col": "id", "params": null, "caption": "id", "type": "hidden"}]
   },
   {
-    "col": "attraction",
-    "params": null,
-    "caption": "Flower Name",
-    "type": "text"
-  }]
-}
+    "name": "box2",
+    "elements":
+      [
+        {"col": "id_garden", "params": null, "caption": "id_garden", "type": "text"},
+        {"col": "attraction", "params": null, "caption": "Flower Name", "type": "text"}
+      ]
+  }
 ]'),
 
-(7, 2, 'query', 'Gardens',     2, 'gardens',     'id', 'Gardens List', NULL),
-(8, 2, 'query', 'Attractions', 2, 'attractions', 'id', 'Attractions List', NULL),
+(7, 2, 'query', 'Gardens',     2, 'gardens',     'id', 'Gardens List',
+'[
+  {"col": "id", "caption": "id"},
+  {"col": "name", "caption": "Name"},
+  {"col": "city", "caption": "City"}
+]'),
+
+(8, 2, 'query', 'Attractions', 2, 'attractions', 'id', 'Attractions List',
+'[
+  {"col": "id", "caption": "id"},
+  {"col": "id_garden", "caption": "id_garden", "link": "form?_id=5"},
+  {"col": "attraction", "caption": "attraction"}
+]'),
 
 (9, 1, 'form',  'Objects',     1, 'af_objects',  'id', 'Sentosa Objects',
 '[
-{
-  "name": "box1",
-  "elements": [{
-    "col": "id",
-    "params": null,
-    "caption": "id",
-    "type": "hidden"
-  }]
-},
-
-{
-  "name": "box2",
-  "elements": [{
-    "col": "id_app",
-    "params": null,
-    "caption": "Application",
-    "type": "text"
+  {
+    "name": "box1",
+    "elements":
+      [{"col": "id", "params": null, "caption": "id", "type": "hidden"}]
   },
   {
-    "col": "type",
-    "params": null,
-    "caption": "Type",
-    "type": "text"
+    "name": "box2",
+    "elements":
+      [
+        {"col": "id_app", "params": null, "caption": "Application", "type": "text"},
+        {"col": "type", "params": null, "caption": "Type", "type": "text"},
+        {"col": "name", "params": null, "caption": "Name", "type": "text"},
+        {"col": "id_connection", "params": null, "caption": "Connection", "type": "text"},
+        {"col": "source", "params": null, "caption": "Source", "type": "text"},
+        {"col": "pk", "params": null, "caption": "Primary Key", "type": "text"}
+      ]
   },
   {
-    "col": "name",
-    "params": null,
-    "caption": "Name",
-    "type": "text"
+    "name": "box3",
+    "elements":
+      [{"col": "description", "params": null, "caption": "Description", "type": "text"}]
   },
   {
-    "col": "id_connection",
-    "params": null,
-    "caption": "Connection",
-    "type": "text"
-  },
-  {
-    "col": "source",
-    "params": null,
-    "caption": "Source",
-    "type": "text"
-  },
-  {
-    "col": "pk",
-    "params": null,
-    "caption": "Primary Key",
-    "type": "text"
-  }]
-},
-
-
-{
-  "name": "box3",
-  "elements": [{
-    "col": "description",
-    "params": null,
-    "caption": "Description",
-    "type": "text"
-  }]
-},
-
-{
-  "name": "box4",
-  "elements": [{
-    "col": "def",
-    "params": null,
-    "caption": "Definition",
-    "type": "text"
-  }]
-}
-
+    "name": "box4",
+    "elements":
+      [{"col": "def", "params": null, "caption": "Definition", "type": "text"}]
+  }
 ]'
 );
-
-create table af_forms (
-  id integer primary key autoincrement,
-  id_object integer,
-  box varchar(45),
-  col varchar(45),
-  type varchar(45),
-  caption varchar(45),
-  params string,
-  foreign key (id_object) references af_objects (id)
-);
-
-insert into af_forms values
-(1,  1, 'box1', 'id',          'hidden', 'id',          NULL),
-(2,  1, 'box2', 'username',    'text',   'User Name',   NULL),
-(3,  1, 'box2', 'password',    'text',   'Password',    NULL),
-
-(4,  2, 'box1', 'id',          'hidden', 'id',          NULL),
-(5,  2, 'box2', 'groupname',   'text',   'Group Name',  NULL),
-
-(6,  5, 'box1', 'id',          'hidden', 'id',          NULL),
-(7,  5, 'box2', 'name',        'text',   'Garden Name', NULL),
-(8,  5, 'box2', 'city',        'text',   'City',        NULL),
-(9,  5, 'box3', '8',           'query',  'Attractions', 'q.id_garden=f.id'),
-
-(10, 6, 'box1', 'id',          'hidden', 'id',          NULL),
-(11, 6, 'box2', 'id_garden',   'text',   'id_garden',   NULL),
-(12, 6, 'box2', 'attraction',  'text',   'Flower Name', NULL);
-
-create table af_query (
-  id integer primary key autoincrement,
-  id_object integer,
-  col string,
-  caption string,
-  link string,
-  global_search int,
-  foreign key(id_object) references af_objects(id)
-);
-
-insert into af_query (id_object, col, caption, link, global_search) values
-(3, 'id',         'id',         NULL,         0),
-(3, 'username',   'User Name',  NULL,         1),
-(3, 'password',   'Password',   NULL,         0),
-
-(4, 'id',         'id',         NULL,         0),
-(4, 'groupname',  'Group Name', NULL,         1),
-
-(7, 'id',         'id',         NULL,         0),
-(7, 'name',       'Name',       NULL,         0),
-(7, 'city',       'City',       NULL,         0),
-
-(8, 'id',         'id',         NULL,         0),
-(8, 'id_garden',  'id_garden',  'form?_id=5', 0),
-(8, 'attraction', 'Attraction', NULL,         0);

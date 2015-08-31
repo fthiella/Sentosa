@@ -1,5 +1,5 @@
 <%flags>
-  extends => 'Base.mp';
+  extends => undef;
 </%flags>
 <%class>
   has '_id';
@@ -11,22 +11,18 @@
   has 'sEcho';
 </%class>
 <%init>
+  use JSON ();
   use Sentosa::Objects;
 
-  my ($select) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
-  if (!$select) { $m->not_found(); }; # query not found
+  my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
+  if (!$obj) { $m->not_found(); }; # form not found
   
-  my ($conn) = Sentosa::Objects::get_queryconnection($._id, $m->session->{auth_id});
-  if (!$conn) {
-    # connection not found - object does not exist, or user is not allowed, or user is not authenticated
-    $m->not_found();
-  };
-  
-  my (@columns) = Sentosa::Objects::get_querycolumns($._id, $m->session->{auth_id});
-  my @fields = map { $_->{col} } @columns;
-  my @links = map { $_->{link} } @columns;
-  
-  my $h = DBI->connect($conn->{db}, $conn->{username}, $conn->{password}) or die("connection to ".$conn->{db}." error.\n");
+  my $columns = JSON->new->utf8->decode($obj->{def});
+
+  my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
+
+  my @fields = map { $_->{col} } @{$columns};
+  my @links = map { $_->{link} } @{$columns};
 
   my @active_conditions = ();
   my @active_filters = ();
@@ -49,8 +45,8 @@
 
 #  #################################################################
   
-  my $query          = "SELECT ".join(',', @fields)." FROM ".$select->{source};
-  my $query_filt     = "SELECT ".join(',', @fields)." FROM ".$select->{source};
+  my $query          = "SELECT ".join(',', @fields)." FROM ".$obj->{source};
+  my $query_filt     = "SELECT ".join(',', @fields)." FROM ".$obj->{source};
   if (@active_conditions) { $query_filt = "$query WHERE " . join ' AND ', @active_conditions; }
 
   my $query_cnt_all  = "SELECT COUNT(*) AS rows FROM ($query) q\n";

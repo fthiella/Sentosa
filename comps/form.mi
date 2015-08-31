@@ -90,18 +90,18 @@
 
 % # TODO: is order of boxes guaranteed?
 % foreach my $box (@{ $.form->{boxes} }) {  
-<div id=<% $.form->{id} %>_<% $box->{name} %>" class="form-group">
+<div id="<% $.form->{id} %>_<% $box->{name} %>" class="form-group">
 
 <%perl>
     foreach my $element (@{ $box->{elements} }) {
-			given ($element->{type}) {
-				when ('hidden')   { print $.input_hidden($element->{col}, $element->{caption}); }
-        when ('text')     { print $.input_text($element->{col}, $element->{caption}, ''); }
-        when ('textarea') { print $.input_textarea($element->{col}, $element->{caption}, ''); }
-        when ('checkbox') { print $.input_checkbox($element->{col}, $element->{caption}, ''); }
-        when ('file')			{ print $.input_file($element->{col}, $element->{caption}, ''); }
-				when ('query')    { print $.query($element->{col}, $element->{caption}, $element->{params}, '1', '1', '1'); }
-			}
+		given ($element->{type}) {
+		  when ('hidden')   { print $.input_hidden($element->{col}, $element->{caption}); }
+		  when ('text')     { print $.input_text($element->{col}, $element->{caption}, ''); }
+		  when ('textarea') { print $.input_textarea($element->{col}, $element->{caption}, ''); }
+		  when ('checkbox') { print $.input_checkbox($element->{col}, $element->{caption}, ''); }
+		  when ('file')		{ print $.input_file($element->{col}, $element->{caption}, ''); }
+		  when ('query')    { print $.query($element->{col}, $element->{caption}, $element->{params}, '1', '1', '1'); }
+		}
     }
 </%perl>
 

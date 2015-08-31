@@ -6,7 +6,7 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
   has 'button';
 </%class>
 <%flags>
-  extends => 'Base.mp';
+  extends => undef;
 </%flags>
 <%init>
   use feature qw( switch );
