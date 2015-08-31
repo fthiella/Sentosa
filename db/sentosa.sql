@@ -109,31 +109,15 @@ insert into af_objects values
 -- management
 (1, 1, 'form', 'Users', 1, 'af_users', 'id', 'Users Form',
 '[
-  {
-    "name": "box1", "elements":
-    [{"col": "id", "params": null, "caption": "id", "type": "hidden"}]
-  },
-  {
-    "name": "box2", "elements":
-    [
-      {"col": "username", "params": null, "caption": "User Name", "type": "text" },
-      {"col": "password", "params": null, "caption": "Password", "type": "text" }
-    ]
-  }
+  {"box": "box1", "col": "id", "params": null, "caption": "id", "type": "hidden"},
+  {"box": "box2", "col": "username", "params": null, "caption": "User Name", "type": "text" },
+  {"box": "box2", "col": "password", "params": null, "caption": "Password", "type": "text" }
 ]'),
 
 (2, 1, 'form', 'Groups', 1, 'af_groups', 'id', 'Groups Form',
 '[
-  {
-    "name": "box1",
-    "elements":
-      [{"col": "id", "params": null, "caption": "id", "type": "hidden"}]
-  },
-  {
-    "name": "box2",
-    "elements":
-      [{"col": "groupname", "params": null, "caption": "Group Name", "type": "text" }]
-  }
+  {"box": "box1", "col": "id", "params": null, "caption": "id", "type": "hidden"},
+  {"box": "box2", "col": "groupname", "params": null, "caption": "Group Name", "type": "text" }
 ]'),
 
 (3, 1, 'query', 'Users', 1, 'af_users', 'id', 'Users List',
@@ -152,43 +136,17 @@ insert into af_objects values
 
 (5, 2, 'form', 'Gardens', 2, 'gardens', 'id', 'Gardens Form',
 '[
-  {
-    "name": "box1",
-    "elements":
-      [{"col": "id", "params": null, "caption": "id", "type": "hidden"}]
-  },
-  {
-    "name": "box2",
-    "elements":
-      [
-        {"col": "name", "params": null, "caption": "Garden Name", "type": "text"},
-        {"col": "city", "params": null, "caption": "City", "type": "text"}
-      ]
-  },
-  {
-    "name": "box3",
-    "elements":
-      [
-        {"col": "8", "params": "q.id_garden=f.id", "caption": "Attractions", "type": "query"}
-      ]
-  }
+  {"box": "box1", "col": "id", "params": null, "caption": "id", "type": "hidden"},
+  {"box": "box2", "col": "name", "params": null, "caption": "Garden Name", "type": "text"},
+  {"box": "box2", "col": "city", "params": null, "caption": "City", "type": "text"},
+  {"box": "box3", "col": "8", "params": "q.id_garden=f.id", "caption": "Attractions", "type": "query"}
 ]'),
 
 (6, 2, 'form',  'Attractions', 2, 'attractions', 'id', 'Attractions Form',
 '[
-  {
-    "name": "box1",
-    "elements":
-      [{"col": "id", "params": null, "caption": "id", "type": "hidden"}]
-  },
-  {
-    "name": "box2",
-    "elements":
-      [
-        {"col": "id_garden", "params": null, "caption": "id_garden", "type": "text"},
-        {"col": "attraction", "params": null, "caption": "Flower Name", "type": "text"}
-      ]
-  }
+  {"box": "box1", "col": "id", "params": null, "caption": "id", "type": "hidden"},
+  {"box": "box2", "col": "id_garden", "params": null, "caption": "id_garden", "type": "text"},
+  {"box": "box2", "col": "attraction", "params": null, "caption": "Flower Name", "type": "text"}
 ]'),
 
 (7, 2, 'query', 'Gardens',     2, 'gardens',     'id', 'Gardens List',
@@ -207,32 +165,22 @@ insert into af_objects values
 
 (9, 1, 'form',  'Objects',     1, 'af_objects',  'id', 'Sentosa Objects',
 '[
-  {
-    "name": "box1",
-    "elements":
-      [{"col": "id", "params": null, "caption": "id", "type": "hidden"}]
-  },
-  {
-    "name": "box2",
-    "elements":
-      [
-        {"col": "id_app", "params": null, "caption": "Application", "type": "text"},
-        {"col": "type", "params": null, "caption": "Type", "type": "text"},
-        {"col": "name", "params": null, "caption": "Name", "type": "text"},
-        {"col": "id_connection", "params": null, "caption": "Connection", "type": "text"},
-        {"col": "source", "params": null, "caption": "Source", "type": "text"},
-        {"col": "pk", "params": null, "caption": "Primary Key", "type": "text"}
-      ]
-  },
-  {
-    "name": "box3",
-    "elements":
-      [{"col": "description", "params": null, "caption": "Description", "type": "text"}]
-  },
-  {
-    "name": "box4",
-    "elements":
-      [{"col": "def", "params": null, "caption": "Definition", "type": "text"}]
-  }
+  {"box": "box1", "col": "id", "params": null, "caption": "id", "type": "hidden"},
+  {"box": "box2", "col": "id_app", "params": null, "caption": "Application", "type": "text"},
+  {"box": "box2", "col": "type", "params": null, "caption": "Type", "type": "text"},
+  {"box": "box2", "col": "name", "params": null, "caption": "Name", "type": "text"},
+  {"box": "box2", "col": "id_connection", "params": null, "caption": "Connection", "type": "text"},
+  {"box": "box2", "col": "source", "params": null, "caption": "Source", "type": "text"},
+  {"box": "box2", "col": "pk", "params": null, "caption": "Primary Key", "type": "text"},
+  {"box": "box3", "col": "description", "params": null, "caption": "Description", "type": "text"},
+  {"box": "box4", "col": "def", "params": null, "caption": "Definition", "type": "text"}
 ]'
-);
+),
+
+(10, 2, 'form', 'mult', 2, 'multiple', 'key1,key2,key3', 'Multiple keys',
+'[
+  {"box": "box1", "col": "key1", "params": null, "caption": "key1", "type": "text"},
+  {"box": "box1", "col": "key2", "params": null, "caption": "key2", "type": "text"},
+  {"box": "box1", "col": "key3", "params": null, "caption": "key3", "type": "text"},
+  {"box": "box1", "col": "v", "params": null, "caption": "v", "type": "text"}
+]');

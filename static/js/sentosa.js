@@ -9,6 +9,7 @@ $(document).ready(function()
 
     switch (action1) {
       case "save":
+        console.log(form.attr('action') + '&button=save&' + $('.form-control', form).serialize());
         if ($("#is_dirty", form).val()=="1") {
           /* SAVE */
           $.getJSON(form.attr('action'), 'button=save&' + $('.form-control', form).serialize(), function(res) {
@@ -36,6 +37,10 @@ $(document).ready(function()
           pk_ser = pk_ser + $('input#' + item, form).serialize()+ '&';
         });
         /* TODO: check is_dirty first! and is_dirty will have a unique name */
+        console.log(form.attr('action'));
+        console.log('button=' + action1 + '&' +
+          pk_ser +
+          $('input#goto_record', form).serialize());
         $.getJSON(
           form.attr('action'),
           'button=' + action1 + '&' +

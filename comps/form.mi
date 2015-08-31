@@ -4,6 +4,7 @@
 
 <%init>
   use feature "switch";
+  use List::MoreUtils qw(uniq);
 </%init>
 
 <%method input_hidden ($id, $caption)>    <label for="<% $id | HTMLEntities %>" class="control-label col-sm-2"><% $caption | HTMLEntities %> (hidden)</label>
@@ -84,23 +85,28 @@
 
 % # TODO: use Poet function to create URL?
 <form id="<% $.form->{id} %>" action="db?_id=<% $.form->{id} %>" method="post" enctype="multipart/form-data" class='form-horizontal form-bordered' data-pk="<% $.form->{pk} %>">
-% # TODO: give a unique name to is_dirty
+% # TODO: give a unique name to is_dirty?
   <input type="hidden" id="is_dirty" name="<% $.form->{id} %>_is_dirty" value="0" />
   <input type="hidden" id="goto_record" name="goto_record" value="<% $.form->{record} %>" />
 % # TODO: is order of boxes guaranteed? sort by box name?
-% foreach my $box (@{ $.form->{boxes} }) {  
-<div id="<% $.form->{id} %>_<% $box->{name} %>" class="form-group">
+% foreach my $box ( uniq map { $_->{box} } @{$.form->{boxes}} ) {
+% # see this! http://perlmaven.com/unique-values-in-an-array-in-perl
+<div id="<% $.form->{id} %>_<% $box %>" class="form-group">
 
 <%perl>
-    foreach my $element (@{ $box->{elements} }) {
-		given ($element->{type}) {
-		  when ('hidden')   { print $.input_hidden($element->{col}, $element->{caption}); }
-		  when ('text')     { print $.input_text($element->{col}, $element->{caption}, ''); }
-		  when ('textarea') { print $.input_textarea($element->{col}, $element->{caption}, ''); }
-		  when ('checkbox') { print $.input_checkbox($element->{col}, $element->{caption}, ''); }
-		  when ('file')		{ print $.input_file($element->{col}, $element->{caption}, ''); }
-		  when ('query')    { print $.query($element->{col}, $element->{caption}, $element->{params}, '1', '1', '1'); }
-		}
+    foreach my $element (@{$.form->{boxes}}) {
+      if ($element->{box} eq $box) {
+    
+        given ($element->{type}) {
+    		  when ('hidden')   { print $.input_hidden($element->{col}, $element->{caption}); }
+    		  when ('text')     { print $.input_text($element->{col}, $element->{caption}, ''); }
+    		  when ('textarea') { print $.input_textarea($element->{col}, $element->{caption}, ''); }
+          when ('checkbox') { print $.input_checkbox($element->{col}, $element->{caption}, ''); }
+    		  when ('file')		{ print $.input_file($element->{col}, $element->{caption}, ''); }
+          when ('query')    { print $.query($element->{col}, $element->{caption}, $element->{params}, '1', '1', '1'); }
+        }
+ 
+      }
     }
 </%perl>
 
