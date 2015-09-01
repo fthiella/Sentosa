@@ -53,7 +53,6 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
   ####################################################################
 
   my $csv_columns = join(',', map { $_->{col} } @all_columns);
-  dc($csv_columns);
 
   #
   my @columns = ();

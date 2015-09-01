@@ -95,7 +95,7 @@
 
 <%perl>
     foreach my $element (@{$.form->{boxes}}) {
-      if ($element->{box} eq $box) {
+      if (($element->{box} eq $box) || ((!defined $box) && (!defined $element->{box}))) {
     
         given ($element->{type}) {
     		  when ('hidden')   { print $.input_hidden($element->{col}, $element->{caption}); }
@@ -104,6 +104,7 @@
           when ('checkbox') { print $.input_checkbox($element->{col}, $element->{caption}, ''); }
     		  when ('file')		{ print $.input_file($element->{col}, $element->{caption}, ''); }
           when ('query')    { print $.query($element->{col}, $element->{caption}, $element->{params}, '1', '1', '1'); }
+		  when (undef) { print $.input_text($element->{col}, $element->{caption}, ''); }
         }
  
       }
