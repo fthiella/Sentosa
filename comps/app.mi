@@ -1,0 +1,6 @@
+<%class>
+  has '_app';
+</%class>
+<h1>Welcome to Sentosa</h1>
+
+This is the homepage of the app <% $._app %>

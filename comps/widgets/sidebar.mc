@@ -1,13 +1,16 @@
+<%class>
+  has '_app';
+</%class>
 <%init>
   use Sentosa::Users;
   use Sentosa::Objects;
   # TODO: this should go to AJAX.
-  # TODO: And maybe use some perlish function instead of foreach? ;)
-  my @apps = map { {url => $_->{url} . '/', title => $_->{details}} } Sentosa::Users::get_appsuserinfo($m->session->{auth_id});
-  my @queries = map { {url=>'query?_id='.$_->{id}, title=>$_->{description}} } Sentosa::Objects::get_objectlist($m->session->{auth_id}, 'query');
-  my @forms = map { {url=>'form?_id='.$_->{id}, title=>$_->{description}} } Sentosa::Objects::get_objectlist($m->session->{auth_id}, 'form');
+
+  my @apps = map { {url => '/' . $_->{url} . '/', title => $_->{details}} } Sentosa::Users::get_appsuserinfo($m->session->{auth_id});
+  my @queries = map { {url=> '/'. $._app . '/query/'.$_->{id}, title=>$_->{description}} } Sentosa::Objects::get_objectlist($m->session->{auth_id}, 'query', $._app);
+  my @forms = map { {url=> '/' . $._app . '/form/'.$_->{id}, title=>$_->{description}} } Sentosa::Objects::get_objectlist($m->session->{auth_id}, 'form', $._app);
 </%init>
-            
+
             <& sidebar.mi, items=>
                 [
                   {type=>'fa-bar-chart-o', title=>'Applications', url=>'', second=> [ @apps ] },

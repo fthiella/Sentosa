@@ -1,5 +1,6 @@
 <%class>
 has 'title';
+has '_app';
 </%class>
 
 <%augment wrap><!DOCTYPE html>
@@ -86,7 +87,7 @@ has 'title';
               <& widgets/dropdown_alerts.mc &>
               <& widgets/dropdown_user.mi &>
             </ul>
-            <& /widgets/sidebar.mc &>
+            <& /widgets/sidebar.mc, _app => $._app &>
 
             <!-- /.navbar-static-side -->
         </nav>

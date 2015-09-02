@@ -41,10 +41,10 @@ sub get_object {
 
 sub get_objectlist {
   # TODO: return only objects per app, add id_app parameter
-  my ($userid, $objecttype) = @_;
+  my ($userid, $objecttype, $app) = @_;
   my $ar = $dbh->selectall_arrayref(
-    "SELECT o.id, o.name, o.source, o.description
-    FROM af_objects o
+    "SELECT o.id, o.name, o.source, o.description, a.url, a.details
+    FROM af_objects o INNER JOIN af_apps a ON o.id_app=a.id
     WHERE
       (o.type=?)
       AND
@@ -59,11 +59,13 @@ sub get_objectlist {
             u.id_user=?
             OR '1'=?
         )
+      AND a.url=?
     ",
     {Slice => {}},
     $objecttype,
     $userid,
-    $userid
+    $userid,
+    $app
   );
   # TODO: administrators have to see everything!
 

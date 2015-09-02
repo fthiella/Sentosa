@@ -20,7 +20,7 @@
 % if ($.hide_title eq '0') {
 <h1><% $obj->{description} %></h1>
 % }
-<table id="<% $._id %>" class="table table-nomargin dataTable-custom table-bordered dataTable-scroller" data-ajax-source="query_data?_id=<% $._id %>">
+<table id="<% $._id %>" class="table table-nomargin dataTable-custom table-bordered dataTable-scroller" data-ajax-source="../query_data/<% $._id %>">
 <thead>
   <tr>
 % foreach my $col (map { $_->{caption} } @{$columns}) {
