@@ -11,7 +11,7 @@ create table if not exists af_info (
 
 insert into af_info (attribute, value) values
 ('name', 'Sentosa AutoForms'),
-('version', '0.01');
+('version', '0.09');
  
 -- --------------------------------------------------------
 -- Configuration Tables
@@ -25,8 +25,8 @@ create table if not exists af_users (
 );
 
 insert into af_users (id, username, password) values
-(1, 'admin', 'adminpwd'),
-(2, 'user',  'userpwd');
+(1, 'admin', 'password'),
+(2, 'user',  'password');
 
 -- af_groups: groups
 create table if not exists af_groups (
@@ -36,7 +36,7 @@ create table if not exists af_groups (
 
 insert into af_groups (id, groupname) values
 (1, 'administrators'),
-(2, 'gardens');
+(2, 'samples');
 
 -- af_usergroups: Users to Groups
 create table if not exists af_usergroups (
@@ -61,7 +61,7 @@ create table if not exists af_apps (
 
 insert into af_apps (id, url, details) values
 (1, 'admin', 'Sentosa Management'),
-(2, 'gardens', 'Gardens and Flowers');
+(2, 'chinhook', 'Chinook Sample Database');
 
 -- af_appgroups: Applications to Groups
 create table if not exists af_appgroups (
@@ -87,7 +87,7 @@ create table af_connections (
 
 insert into af_connections (id, db, username, password) values
 (1, 'dbi:SQLite:dbname=data/sentosa.db', '', ''),
-(2, 'dbi:SQLite:dbname=data/samples.db', '', '');
+(2, 'dbi:SQLite:dbname=data/chinook.db', '', '');
 
 -- af_objects: object composing an application
 
@@ -132,55 +132,22 @@ insert into af_objects values
   {"col": "id", "caption": "id"},
   {"col": "groupname", "caption": "Groupname"}
 ]'),
--- sample app
 
-(5, 2, 'form', 'Gardens', 2, 'gardens', 'id', 'Gardens Form',
+-- --------------------
+-- Sample Application
+-- --------------------
+
+(5, 2, 'form', 'Album', 2, 'Album', 'AlbumId', 'Albums Form',
 '[
-  {"box": "box1", "col": "id", "params": null, "caption": "id", "type": "hidden"},
-  {"box": "box2", "col": "name", "params": null, "caption": "Garden Name", "type": "text"},
-  {"box": "box2", "col": "city", "params": null, "caption": "City", "type": "text"},
-  {"box": "box3", "col": "8", "params": "q.id_garden=f.id", "caption": "Attractions", "type": "query"}
+  {"box": "box1", "col": "AlbumId", "params": null, "caption": "AlbumId", "type": "hidden"},
+  {"box": "box2", "col": "Title", "params": null, "caption": "Album Title", "type": "text"},
+  {"box": "box2", "col": "ArtistId", "params": null, "caption": "Artist", "type": "select"},
+  {"box": "box3", "col": "6", "params": "q.AlbumId=f.AlbumId", "caption": "Tracks", "type": "query"}
 ]'),
 
-(6, 2, 'form',  'Attractions', 2, 'attractions', 'id', 'Attractions Form',
+(6, 2, 'query', 'Track', 2, 'Track', 'TrackId', 'Track Query',
 '[
-  {"box": "box1", "col": "id", "params": null, "caption": "id", "type": "hidden"},
-  {"box": "box2", "col": "id_garden", "params": null, "caption": "id_garden", "type": "text"},
-  {"box": "box2", "col": "attraction", "params": null, "caption": "Flower Name", "type": "text"}
-]'),
-
-(7, 2, 'query', 'Gardens',     2, 'gardens',     'id', 'Gardens List',
-'[
-  {"col": "id", "caption": "id"},
-  {"col": "name", "caption": "Name"},
-  {"col": "city", "caption": "City"}
-]'),
-
-(8, 2, 'query', 'Attractions', 2, 'attractions', 'id', 'Attractions List',
-'[
-  {"col": "id", "caption": "id"},
-  {"col": "id_garden", "caption": "id_garden", "link": "form?_id=5"},
-  {"col": "attraction", "caption": "attraction"}
-]'),
-
-(9, 1, 'form',  'Objects',     1, 'af_objects',  'id', 'Sentosa Objects',
-'[
-  {"box": "box1", "col": "id", "params": null, "caption": "id", "type": "hidden"},
-  {"box": "box2", "col": "id_app", "params": null, "caption": "Application", "type": "text"},
-  {"box": "box2", "col": "type", "params": null, "caption": "Type", "type": "text"},
-  {"box": "box2", "col": "name", "params": null, "caption": "Name", "type": "text"},
-  {"box": "box2", "col": "id_connection", "params": null, "caption": "Connection", "type": "text"},
-  {"box": "box2", "col": "source", "params": null, "caption": "Source", "type": "text"},
-  {"box": "box2", "col": "pk", "params": null, "caption": "Primary Key", "type": "text"},
-  {"box": "box3", "col": "description", "params": null, "caption": "Description", "type": "text"},
-  {"box": "box4", "col": "def", "params": null, "caption": "Definition", "type": "text"}
-]'
-),
-
-(10, 2, 'form', 'mult', 2, 'multiple', 'key1,key2,key3', 'Multiple keys',
-'[
-  {"box": "box1", "col": "key1", "params": null, "caption": "key1", "type": "text"},
-  {"box": "box1", "col": "key2", "params": null, "caption": "key2", "type": "text"},
-  {"box": "box1", "col": "key3", "params": null, "caption": "key3", "type": "text"},
-  {"box": "box1", "col": "v", "params": null, "caption": "v", "type": "text"}
+  {"box": "box1", "col": "TrackId",  "params": null, "caption": "TrackId",    "type": "hidden"},
+  {"box": "box2", "col": "Name",     "params": null, "caption": "Track Name", "type": "text"},
+  {"box": "box2", "col": "AlbumId",  "params": null, "caption": "Album",      "type": "hidden",   "searchcriteria": "="}
 ]');

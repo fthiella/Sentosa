@@ -1,0 +1,27 @@
+<!-- jQuery -->
+<script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<!-- Metis Menu Plugin JavaScript -->
+<script src="/static/bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+<!-- Morris Charts JavaScript -->
+<script src="/static/bower_components/raphael/raphael-min.js"></script>
+<script src="/static/bower_components/morrisjs/morris.min.js"></script>
+<!-- DISABLED <script src="/static/js/morris-data.js"></script> -->
+
+<!-- Custom Theme JavaScript -->
+<script src="/static/dist/js/sb-admin-2.js"></script>
+
+<!-- DataTables JavaScript -->
+<script src="/static/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/static/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+
+<!-- see here: https://select2.github.io/ -->
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css" rel="stylesheet" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
+
+<!-- sentosa module -->
+<script src="/static/js/sentosa.js"></script>

@@ -10,6 +10,7 @@ $(document).ready(function()
     switch (action1) {
       case "save":
         console.log(form.attr('action') + '&button=save&' + $('.form-control', form).serialize());
+        console.log("Is dirty? " + $("#is_dirty", form).val());
         if ($("#is_dirty", form).val()=="1") {
           /* SAVE */
           $.getJSON(form.attr('action'), 'button=save&' + $('.form-control', form).serialize(), function(res) {
@@ -150,6 +151,11 @@ $(document).ready(function()
   /* initialize all tables */
   $('table[data-ajax-source]').each(function (n) {
     init_table($(this));
+  });
+  
+  /* initialize all selects */
+  $('select').each(function (n) {
+    $(this).select2();
   });
 
 });

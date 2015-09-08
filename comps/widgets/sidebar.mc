@@ -21,8 +21,7 @@
     push @sidebar, {type=>'fa-table', title=>'Queries', url=>'', second=>[ @queries ]};
     push @sidebar, {type=>'fa-edit', title=>'Forms', url=>'', second=>[ @forms ] };
     push @sidebar, {type=>'fa-dashboard', title=>'Dashboards', url=>''};
-    push @sidebar, {type=>'fa-bar-chart-o', title=>'Home page', url=>'/'};
+    push @sidebar, {type=>'fa-home', title=>'Home page', url=>'/'};
   }
 </%init>
-
-            <& sidebar.mi, items=> \@sidebar &>
+<& sidebar.mi, items=> \@sidebar &>
