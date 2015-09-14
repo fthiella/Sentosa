@@ -35,7 +35,7 @@ Example:
   my @boxes = JSON->new->utf8->decode($form->{def});
 </%init>
 <&
-  form_widget.mi,
+  form-widget.mi,
     form => {
       id => $form->{id},
       description => $form->{description},

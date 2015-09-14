@@ -17,24 +17,24 @@ has '_app';
     <title><% $.title %></title>
 % }}
 
-<& head_includes.mi &>
+<& head-includes.mi &>
 </head>
 
 <body>
-<& body_includes.mi &>
+<& body-includes.mi &>
 
     <div id="wrapper">
 
         <!-- Navigation -->
         <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
 % $.Defer {{
-              <& widgets/navbar_header.mi, caption=>$.title &>
+              <& widgets/navbar-header.mi, caption=>$.title &>
 % }}
             <ul class="nav navbar-top-links navbar-right">
-              <& widgets/dropdown_tasks.mc &>
-              <& widgets/dropdown_messages.mc &>
-              <& widgets/dropdown_alerts.mc &>
-              <& widgets/dropdown_user.mi &>
+              <& widgets/dropdown-tasks.mc &>
+              <& widgets/dropdown-messages.mc &>
+              <& widgets/dropdown-alerts.mc &>
+              <& widgets/dropdown-user.mi &>
             </ul>
             <& /widgets/sidebar.mc, _app => $._app &>
 

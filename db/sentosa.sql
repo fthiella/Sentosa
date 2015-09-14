@@ -141,7 +141,7 @@ insert into af_objects values
 '[
   {"box": "box1", "col": "AlbumId", "params": null, "caption": "AlbumId", "type": "hidden"},
   {"box": "box2", "col": "Title", "params": null, "caption": "Album Title", "type": "text"},
-  {"box": "box2", "col": "ArtistId", "params": null, "caption": "Artist", "type": "select"},
+  {"box": "box2", "col": "ArtistId", "params": null, "caption": "Artist", "type": "select", "options": [{"id": "1", "option": "Ac/Dc"}, {"id": "2", "option": "Accept"}, {"id": "3", "option": "Aerosmith"}]},
   {"box": "box3", "col": "6", "params": "q.AlbumId=f.AlbumId", "caption": "Tracks", "type": "query"}
 ]'),
 

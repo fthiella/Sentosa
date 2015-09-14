@@ -1,4 +1,4 @@
-                <& dropdown_alerts.mi, items=>
+                <& dropdown-alerts.mi, items=>
                     [
                       {type=>'fa-comment', notification=>'New Comment', when=>'4 minutes ago'},
                       {type=>'fa-twitter', notification=>'3 New Followers', when=>'7 minutes ago'},

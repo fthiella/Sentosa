@@ -23,13 +23,12 @@
   my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
 
   my @fields = map { $_->{col} } @{$columns};
-  my @links = map { $_->{link} } @{$columns};
+  my @links = map { $_->{link} } @{$columns}; # TODO: Datatables can handle it client-side
 
   my @active_conditions = ();
   my @active_filters = ();
   
   # check if some sSearch_n field has a value
-  # TODO: which kind of search do we have to apply?
   # TODO: if there are more datatables on the same page, is this handled correctly?
   my @sSearch = ();
   foreach (grep {/^sSearch_\d+/} keys $.args) {

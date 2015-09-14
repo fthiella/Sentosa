@@ -97,10 +97,20 @@ $(document).ready(function()
   /* NEW FUNCTIONS */
 
   function init_table(table) {
+    
+    var aoColumnDefs = [];
+    $("tfoot input", table).each(function (n) {console.dir($(this));
+      aoColumnDefs.push(
+        {"sName": $(this).attr('name'), "bVisible": $(this).attr('type')=='text', "aTargets": [ n ] }
+      );
+    });
+    // console.dir(aoColumnDefs);
+    
     var oTable = table.dataTable( {
       "bProcessing": true,
       "bServerSide": true,
       "sAjaxSource": table.attr("data-ajax-source"),
+      "aoColumnDefs": aoColumnDefs,
   
       "oLanguage": {
         "sLengthMenu":   "Mostra _MENU_ righe per pagina",
@@ -112,7 +122,7 @@ $(document).ready(function()
       }
     } );
 
-    /* links form fields to table fields. Use a plugin like fieldsyc? */
+    /* SYNC: links form fields to table fields. Use a plugin like fieldsyc? */
     $("tfoot input[data-from-form]", table).each( function (n) {
       var to_field = $(this);
 

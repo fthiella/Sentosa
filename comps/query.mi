@@ -20,7 +20,7 @@
 % if ($.hide_title eq '0') {
 <h1><% $obj->{description} %></h1>
 % }
-<table id="<% $._id %>" class="table table-nomargin dataTable-custom table-bordered dataTable-scroller" data-ajax-source="../query_data/<% $._id %>">
+<table id="<% $._id %>" class="table table-nomargin dataTable-custom table-bordered dataTable-scroller" data-ajax-source="../query-data/<% $._id %>">
 <thead>
   <tr>
 % foreach my $col (map { $_->{caption} } @{$columns}) {
@@ -35,17 +35,17 @@
   </tbody>
 <tfoot>
   <tr>
-% foreach my $col (@fields) {
+% foreach my $col (@{$columns}) {
 %   my $data_link;
-%   if (($.table_link) && ($col eq $.table_link->{to_field})) {
+%   if (($.table_link) && ($col->{col} eq $.table_link->{to_field})) {
 %     $data_link = 'data-from-form="'. $.table_link->{from_form} .'" data-from-field="'. $.table_link->{from_field} .'"';
 %   } else {
 %     $data_link = "";
 %   }
 %   if ( $.hide_bottom eq '0' ) {
-    <th><input type="text" name="<% $._id %>_search_<% $col %>" value="<% $col %>" data-value="<% $col %>" <% $data_link %> class="search_init" /></th>
+    <th><input type="<% $col->{type} %>" name="<% $._id %>_search_<% $col->{col} %>" value="<% $col->{col} %>" data-value="<% $col->{col} %>" <% $data_link %> class="search_init" /></th>
 %   } else {
-    <th><input type="hidden" name="<% $._id %>_search_<% $col %>" value="<% $col %>" data-value="<% $col %>" <% $data_link %> class="search_init" /></th>
+    <th><input type="hidden" name="<% $._id %>_search_<% $col->{col} %>" value="<% $col->{col} %>" data-value="<% $col->{col} %>" <% $data_link %> class="search_init" /></th>
 %   }
 % }
   </tr>
