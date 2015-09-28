@@ -11,6 +11,7 @@
   has 'sEcho';
 </%class>
 <%init>
+  # TODO: it is fun to code this component, but it's still not rock solid, maybe DBIx::Class could help much more? http://www.dbix-class.org/
   use feature "switch";
   use JSON ();
   use Sentosa::Objects;

@@ -14,6 +14,8 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
   use JSON ();
   use Sentosa::Objects;
   
+  dc $.args;
+  
   my ($form) = Sentosa::Objects::get_object($._id, 'form', $m->session->{auth_id});
   if (!$form) { $m->not_found(); }; # form not found
   
@@ -84,14 +86,11 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
         push @params, @values;
         push @params, @pk_values;
       } else {
-        # TODO: add given keys, if any!
+        # TODO: remove given keys from the INSERT INTO statement?
         $query='INSERT INTO '.$form->{source}.' ('.join(',', @columns).') VALUES ('.substr('?,'x scalar @values, 0, -1).')';
         @params=@values;
       }
       
-      print dh $query;
-      return;
-
     }
 
     when ('primo') {

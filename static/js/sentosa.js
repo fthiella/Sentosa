@@ -1,5 +1,13 @@
 var asInitVals = new Array(); /* for datatables */
 
+$.fn.formObject = function (obj) {
+    obj = obj || {};
+    $.each(this.serializeArray(), function (_, kv) {
+        obj[kv.name] = kv.value;
+    });
+    return obj;
+};
+
 $(document).ready(function()
 {
   /* ************** */
@@ -13,7 +21,7 @@ $(document).ready(function()
         console.log("Is dirty? " + $("#is_dirty", form).val());
         if ($("#is_dirty", form).val()=="1") {
           /* SAVE */
-          $.getJSON(form.attr('action'), 'button=save&' + $('.form-control', form).serialize(), function(res) {
+          $.getJSON(form.attr('action'), $('.form-control', form).formObject({ button: "save" }), function(res) {
             if (res["_status"] === "OK") {
               $('input#is_dirty', form).val('');
               /* proceed with next action */
@@ -33,20 +41,14 @@ $(document).ready(function()
         });
         break;
       default:
-        var pk_ser = '';
+        var pk_obj = {};
         form.attr('data-pk').split(",").forEach(function (item) {
-          pk_ser = pk_ser + $('input#' + item, form).serialize()+ '&';
+          pk_obj[item] = $('input#' + item, form).val();
         });
         /* TODO: check is_dirty first! and is_dirty will have a unique name */
-        console.log(form.attr('action'));
-        console.log('button=' + action1 + '&' +
-          pk_ser +
-          $('input#goto_record', form).serialize());
         $.getJSON(
           form.attr('action'),
-          'button=' + action1 + '&' +
-          pk_ser +
-          $('input#goto_record', form).serialize(),
+          $('input#goto_record', form).formObject($.extend({}, pk_obj, { button: action1})),
           function( res ) {
             $.each( res, function( key, val ) { /* TODO: disable is_dirty, and don't always call change! */
               $('#'+key, form).val(val).change();
