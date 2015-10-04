@@ -32,11 +32,20 @@
   # check if some sSearch_n field has a value
   # TODO: if there are more datatables on the same page, is this handled correctly?
   my @sSearch = ();
+  my @newSearch = (); # TODO: I'm working on simplifying this module. Also I need to integrate db and query-data together. Work in progress!
   foreach (grep {/^sSearch_\d+/} keys $.args) {
     if ($.args->{$_} ne "") {
       push @sSearch, $_ =~ /sSearch_(\d+)/;
+
+      push @newSearch, {
+        col => @{$columns}[$1]->{col},
+        searchcriteria => @{$columns}[$1]->{searchcriteria},
+        value => $.args->{$_}
+      };
     }
   }
+  
+  dc \@newSearch;
 
   foreach (@sSearch) {
     # push @active_conditions, @fields[$_]." LIKE CONCAT(?, '%')"; # in MySQL casts are often not necessary... what about others dbms?

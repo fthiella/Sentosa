@@ -1,5 +1,12 @@
 var asInitVals = new Array(); /* for datatables */
 
+/* http://datatables.net/plug-ins/api/fnVisibleToColumnIndex */
+/* TODO: next plugin is DEPRECATED */
+jQuery.fn.dataTableExt.oApi.fnVisibleToColumnIndex = function ( oSettings, iMatch )
+{
+    return oSettings.oApi._fnVisibleToColumnIndex( oSettings, iMatch );
+};
+
 $.fn.formObject = function (obj) {
     obj = obj || {};
     $.each(this.serializeArray(), function (_, kv) {
@@ -103,7 +110,7 @@ $(document).ready(function()
     var aoColumnDefs = [];
     $("tfoot input", table).each(function (n) {console.dir($(this));
       aoColumnDefs.push(
-        {"sName": $(this).attr('name'), "bVisible": $(this).attr('type')=='text', "aTargets": [ n ] }
+        {"sName": $(this).attr('name'), "bVisible": $(this).attr('type') || 'text' =='text', "aTargets": [ n ] }
       );
     });
     // console.dir(aoColumnDefs);
@@ -136,7 +143,7 @@ $(document).ready(function()
 
     $("tfoot input", table).keyup( function () {
       /* Filter on the column (the index) of this element */
-      oTable.fnFilter( this.value, $("tfoot input", table).index(this) );
+      oTable.fnFilter( this.value, oTable.fnVisibleToColumnIndex($("tfoot input", table).index(this)) );
     } );
 
     /*
