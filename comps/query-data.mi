@@ -15,95 +15,68 @@
   use feature "switch";
   use JSON ();
   use Sentosa::Objects;
+  use Sentosa::Db;
 
   my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
   if (!$obj) { $m->not_found(); }; # form not found
   
+  # array of hashes @{$columns} one hash for each column
+  # TODO: why am I using this syntax @{$columns} ?
   my $columns = JSON->new->utf8->decode($obj->{def});
-
-  my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
-
-  my @fields = map { $_->{col} } @{$columns};
-  my @links = map { $_->{link} } @{$columns}; # TODO: Datatables can handle it client-side
-
-  my @active_conditions = ();
-  my @active_filters = ();
   
-  # check if some sSearch_n field has a value
-  # TODO: if there are more datatables on the same page, is this handled correctly?
-  my @sSearch = ();
-  my @newSearch = (); # TODO: I'm working on simplifying this module. Also I need to integrate db and query-data together. Work in progress!
+  # create a lookup table, it will make things easier later
+  my %columns_lookup;
+  my $i=0;
+  foreach my $c (@{$columns}) {
+    $columns_lookup{$c->{col}} = $i++;
+  }
+
+  # adds pk info to the columns data structure
+  my $i=0;
+  foreach my $k (split ',', $obj->{pk}) {
+    ${$columns}[ %columns_lookup{k} ]{pk} = $i++;
+  }
+
   foreach (grep {/^sSearch_\d+/} keys $.args) {
     if ($.args->{$_} ne "") {
-      push @sSearch, $_ =~ /sSearch_(\d+)/;
-
-      push @newSearch, {
-        col => @{$columns}[$1]->{col},
-        searchcriteria => @{$columns}[$1]->{searchcriteria},
-        value => $.args->{$_}
-      };
+      # add filter to the column
+      /sSearch_(\d+)/;
+      ${$columns}[ $1 ]{search} = $.args->{$_};
     }
   }
-  
-  dc \@newSearch;
 
-  foreach (@sSearch) {
-    # push @active_conditions, @fields[$_]." LIKE CONCAT(?, '%')"; # in MySQL casts are often not necessary... what about others dbms?
-    
-    # this is for SQLite only. Need to make it dbms independent    
-    my $i = $_;
-    
-    given (@{$columns}[$i]->{searchcriteria}) {
-      when ('=')    { push @active_conditions, @fields[$i].'=?'; }
-      when ('LIKE') { push @active_conditions, @fields[$i]." LIKE ? || '%'"; }
-      when ('SUB')  { push @active_conditions, @fields[$i]." LIKE '%' || ? || '%'"; }
-      when (undef)  { push @active_conditions, @fields[$i]." LIKE ? || '%'"; }
-    }
-
-    push @active_filters, $.args->{"sSearch_$_"};
-  dc $.args->{"sSearch_$_"};
-  }
-  
-  dc @active_conditions;
-  dc $.args->{"sSearch_$_"};
+  my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
+  my %q = Sentosa::Db::selectQuery(
+    $obj->{source},
+    $columns,
+    $.iDisplayStart,
+    $.iDisplayLength,
+    $h->{Driver}->{Name}
+  );
 
 #  #################################################################
   
-  my $query          = "SELECT ".join(',', @fields)." FROM ".$obj->{source};
-  my $query_filt     = "SELECT ".join(',', @fields)." FROM ".$obj->{source};
-  if (@active_conditions) { $query_filt = "$query WHERE " . join ' AND ', @active_conditions; }
+  my $query          = %q{'query'};
+  my $query_filt     = %q{'query_search'};
+  my $query_limit    = %q{'query_limit'};
 
   my $query_cnt_all  = "SELECT COUNT(*) AS rows FROM ($query) q\n";
   my $query_cnt_filt = "SELECT COUNT(*) AS rows FROM ($query_filt) q\n";
 
   #### get number of unfiltered rows ####
-  
-  my $sth;
 
   # get number of total rows, and number of total filtered rows
-  my ($iTotalRecords) = $h->selectrow_array($query_cnt_all);
-  my ($iTotalDisplayRecords) = $h->selectrow_array($query_cnt_filt, undef, @active_filters);
+  my ($iTotalRecords) = $h->selectrow_array($query_cnt_all, undef, @{%q{query_data}});
+  my ($iTotalDisplayRecords) = $h->selectrow_array($query_cnt_filt, undef, @{%q{query_search_data}});
 
   #### get rows ####
 
   my @rows;
 
-  # TODO: LIMIT and OFFSET depends on the database, is there a native DBI solution for this?
-  if ($h->{Driver}->{Name} =~ /^mysql$|^SQLite$/) {
-    $sth = $h->prepare("$query_filt LIMIT ".int($.iDisplayStart).", ".int($.iDisplayLength));
-  } elsif ($h->{Driver}->{Name} =~ /^Pg$/) {
-    $sth = $h->prepare("$query_filt LIMIT ".int($.iDisplayLength)." OFFSET ".int($.iDisplayStart));
-  }
-
-  $sth->execute(@active_filters);
+  my $sth = $h->prepare($query_limit);
+  $sth->execute(@{%q{query_limit_data}});
 
   while (my @row = $sth->fetchrow_array()) {
-    for (my $index=0; $index<=$#links; $index++) {
-      if ($links[$index]) {
-        # TODO: this shoud be handled client side with dataSrc? see it here https://datatables.net/reference/option/ajax
-        $row[$index] = qq{<a href="$links[$index]&_record=$row[$index]">$row[$index]</a>};
-      }
-    }
     push @rows, \@row;
   }
 
