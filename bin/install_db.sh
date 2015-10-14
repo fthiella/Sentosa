@@ -1,5 +1,7 @@
 #!/usr/bin/sh
 
+mkdir -p data
+
 if [ -f data/sentosa.db ];
 then
   echo "Removing old sentosa.db ..."
