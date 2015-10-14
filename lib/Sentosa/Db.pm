@@ -125,12 +125,14 @@ sub selectQuery {
 
   return (
     'query' => "SELECT $sc FROM $source". (($filter ne "")?" WHERE $filter":undef),
-    'query_data' => \@filter_data,
+    'query_data' => [@filter_data],
 
     'query_search' => "SELECT $sc FROM $source". (($search ne "")?" WHERE $search":undef),
-    'query_search_data' => \@filter_search,
+    'query_search_data' => [@filter_search],
 
     'query_limit' => "SELECT$limit1 $sc FROM $source". (($search ne "")?" WHERE $search":undef)."$limit2",
-    'query_limit_data' => \@filter_search
+    'query_limit_data' => [@filter_search]
   );
 }
+
+1;

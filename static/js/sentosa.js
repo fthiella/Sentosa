@@ -161,7 +161,7 @@ $(document).ready(function()
     $("tfoot input", table).blur( function (i) {
       if ( this.value == "" )
       {
-        this.className = table + "search_init";
+        this.className = "search_init";
         this.value = $(this).attr('data-value');
       }
     } );

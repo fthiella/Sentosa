@@ -71,3 +71,5 @@ sub get_objectlist {
 
   return @{ $ar };
 }
+
+1;
