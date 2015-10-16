@@ -36,7 +36,7 @@
 
   ${$columns}[ 0 ]{filter} = 'filter test';
   ${$columns}[ 1 ]{order} = 'DESC';
-  ${$columns}[ 2 ]{order} = 'ASC';
+  ${$columns}[ 1 ]{pk} = 1;
 
   foreach (grep {/^sSearch_\d+/} keys $.args) {
     if ($.args->{$_} ne "") {
@@ -46,13 +46,17 @@
     }
   }
 
-  my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
+#  print dh \$columns;
+
+ # my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
   my %q = Sentosa::Db::selectQuery(
     $obj->{source},
     $columns,
+    'DESC',
+    { move => 'forwards', pk => [66,77] },
     $.iDisplayStart,
     $.iDisplayLength,
-    $h->{Driver}->{Name}
+    'Pg'
   );
 
   print dh \%q;

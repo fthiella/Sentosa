@@ -49,6 +49,8 @@
   my %q = Sentosa::Db::selectQuery(
     $obj->{source},
     $columns,
+    'ASC',
+    {},
     $.iDisplayStart,
     $.iDisplayLength,
     $h->{Driver}->{Name}
