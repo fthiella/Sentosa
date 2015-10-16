@@ -67,7 +67,7 @@ sub selectQuery {
   my ($source, $columns, $start, $length, $dbms) = @_;
 
   # get all column names from the columns array
-  my $sc = join ',', map { $_->{col} } @{$columns}; # TODO: better to use column qualifier
+  my @sc = map { $_->{col} } @{$columns}; # TODO: better to use column qualifier
 
   # Filter: filter table (for example by username)
   # Search: search within filtered table
@@ -75,63 +75,29 @@ sub selectQuery {
   # - grep gets all columns that have to be filtered
   # - map creates "field=?" or "fields LIKE ?" etc.
 
-  my $filter = join ' AND ', map {
-    whereFilter($_->{col}, $_->{searchcriteria}, $dbms)
-  } grep {
-    defined $_->{filter}
-  } @{$columns};
+  my @filter = map { whereFilter($_->{col}, $_->{searchcriteria}, $dbms) } grep { defined $_->{filter} } @{$columns};
+  my @search = map { whereFilter($_->{col}, $_->{searchcriteria}, $dbms) } grep { defined $_->{search} } @{$columns};
 
-  my $search = join ' AND ', (
-  	(
-      map {
-        whereFilter($_->{col}, $_->{searchcriteria}, $dbms)
-      } grep {
-        defined $_->{filter}
-      } @{$columns}
-    )
-    ,
-    (
-      map {
-        whereFilter($_->{col}, $_->{searchcriteria}, $dbms)
-      } grep {
-          defined $_->{search}
-      } @{$columns}
-    )
-  );
-
-  # create parameters list
-
-  my @filter_data = (
-  	map {
-      $_->{filter}
-    } grep {
-      defined $_->{filter}
-    } @{$columns}
-  );
-
-  my @filter_search = (
-  	@filter_data
-    ,
-    (
-    map {
-      $_->{search}
-    } grep {
-      defined $_->{search}
-    } @{$columns}
-    )
-  );
+  my @filter_data =   (map { $_->{filter} }              grep { defined $_->{filter} } @{$columns});
+  my @filter_search = (map { $_->{search} }              grep { defined $_->{search} } @{$columns});
+  my @order =         (map { $_->{col}." ".$_->{order} } grep { defined $_->{order}  } @{$columns});
+  my @pk =            (map { $_->{col}." ASC" }          grep { defined $_->{pk}     } @{$columns});
 
   my ($limit1, $limit2) = limitFilter($start, $length, $dbms);
 
   return (
-    'query' => "SELECT $sc FROM $source". (($filter ne "")?" WHERE $filter":undef),
+    'query' => 'SELECT '.join(',', @sc)." FROM $source". ((@filter)?' WHERE '.join(' AND ', @filter):undef),
     'query_data' => [@filter_data],
 
-    'query_search' => "SELECT $sc FROM $source". (($search ne "")?" WHERE $search":undef),
-    'query_search_data' => [@filter_search],
+    'query_search' => 'SELECT '.join(',', @sc)." FROM $source". (((@filter) || (@search))?' WHERE '.join(' AND ', @filter, @search):undef),
+    'query_search_data' => [@filter_data, @filter_search],
 
-    'query_limit' => "SELECT$limit1 $sc FROM $source". (($search ne "")?" WHERE $search":undef)."$limit2",
-    'query_limit_data' => [@filter_search]
+    'query_limit' =>
+      'SELECT '.$limit1.' '.join(',', @sc).
+      " FROM $source". (((@filter) || (@search))?' WHERE '.join(' AND ', @filter, @search):undef).
+      " ORDER BY ".join(',', @order, @pk).
+      "$limit2",
+    'query_limit_data' => [@filter_data, @filter_search]
   );
 }
 
