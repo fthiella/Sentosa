@@ -114,6 +114,8 @@ sub selectQuery {
 
   my @filter_data =   (map { $_->{filter} }              grep { defined $_->{filter} } @{$columns});
   my @filter_search = (map { $_->{search} }              grep { defined $_->{search} } @{$columns});
+
+  # TODO: pk columns should be ordered (pk asc)
   my @order_by =      (map { $_->{col}." ".$_->{order} } grep { defined $_->{order}  } @{$columns});
   my @order_by_pk =   (map { $_->{col}." $order" }       grep { defined $_->{pk}     } @{$columns});
 
@@ -123,8 +125,6 @@ sub selectQuery {
     $goto->{pk},
     $goto->{move}
   );
-
-  print dh $pk_conditions;
 
   my ($limit1, $limit2) = limitFilter($start, $length, $dbms);
 
@@ -141,6 +141,41 @@ sub selectQuery {
       " ORDER BY ".join(',', @order_by, @order_by_pk).
       "$limit2",
     'query_limit_data' => [@filter_data, @{$pk_conditions_data}, @filter_search]
+  );
+}
+
+sub insertUpdateQuery {
+  # TODO: how to distinguish between empty and NULL?
+  # TODO: what if a primary key is not auto_increment (or is multiple fields?)
+  #       need to distinguish between insert and update, but client side
+  my ($source, $columns, $dbms) = @_;
+
+  # get new columns, and new values
+  my @nc = map { $_->{col} } grep { (defined $_->{new}) && (!defined $_->{pk})} @{$columns};
+  my @nv = map { $_->{new} } grep { (defined $_->{new}) && (!defined $_->{pk})} @{$columns};
+
+  # get pk columns and pk values (if given)
+
+  my @pkc = map { $_->{col} } grep { (defined $_->{new}) && (defined $_->{pk})} @{$columns};
+  my @pkv = map { $_->{new} } grep { (defined $_->{new}) && (defined $_->{pk})} @{$columns};
+
+  return (
+    'query' =>
+      (@pkv)?
+      "UPDATE $source SET ".
+      join(',', map { $_.'=?'} @nc).' '.
+      'WHERE '.
+      join(',', map { $_.'=?'} @pkc)
+      :
+      "INSERT INTO $source (".
+      join(',', @nc).
+      ') VALUES ('.
+      join(',', (map { '?' } @nc) ).
+      ')',
+    'query_data' =>
+      [@nv, @pkv],
+    'query_type' =>
+      (@pkv)?'UPDATE':'INSERT'
   );
 }
 

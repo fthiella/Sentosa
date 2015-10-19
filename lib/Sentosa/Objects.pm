@@ -4,6 +4,8 @@ extends 'Poet::Import';
 
 use Poet qw($dbh);
 
+use JSON ();
+
 sub get_object {
   # TODO: I decided to ignore type, since a query can became a form, and a form can became a query.
   # TODO: I just want to be sure that it's actually a good idea
@@ -70,6 +72,28 @@ sub get_objectlist {
   # TODO: administrators have to see everything!
 
   return @{ $ar };
+}
+
+sub parse_object {
+  my ($obj) = @_;
+
+  # array of hashes @{$columns} one hash for each column
+  my $columns = JSON->new->utf8->decode($obj->{def});
+  
+  # create a lookup table, it will make things easier later
+  my %columns_lookup;
+  my $i=0;
+  foreach my $c (@{$columns}) {
+    $columns_lookup{$c->{col}} = $i++;
+  }
+
+  # adds pk info to the columns data structure
+  my $i=0;
+  foreach my $k (split ',', $obj->{pk}) {
+    ${$columns}[ %columns_lookup->{$k} ]{'pk'} = $i++;
+  }
+
+  return $columns;
 }
 
 1;

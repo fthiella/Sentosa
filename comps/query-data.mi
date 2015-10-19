@@ -1,5 +1,5 @@
 <%flags>
-  extends => undef;
+extends => undef;
 </%flags>
 <%class>
   has '_id';
@@ -19,23 +19,9 @@
 
   my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
   if (!$obj) { $m->not_found(); }; # form not found
-  
-  # array of hashes @{$columns} one hash for each column
-  # TODO: why am I using this syntax @{$columns} ?
-  my $columns = JSON->new->utf8->decode($obj->{def});
-  
-  # create a lookup table, it will make things easier later
-  my %columns_lookup;
-  my $i=0;
-  foreach my $c (@{$columns}) {
-    $columns_lookup{$c->{col}} = $i++;
-  }
+  my ($columns) = Sentosa::Objects::parse_object($obj);
 
-  # adds pk info to the columns data structure
-  my $i=0;
-  foreach my $k (split ',', $obj->{pk}) {
-    ${$columns}[ %columns_lookup->{$k} ]{'pk'} = $i++;
-  }
+  # add sSearch_nn to the columns data structure
 
   foreach (grep {/^sSearch_\d+/} keys $.args) {
     if ($.args->{$_} ne "") {
@@ -70,25 +56,17 @@
   # get number of total rows, and number of total filtered rows
   my ($iTotalRecords) = $h->selectrow_array($query_cnt_all, undef, @{%q->{'query_data'}});
   my ($iTotalDisplayRecords) = $h->selectrow_array($query_cnt_filt, undef, @{%q->{'query_search_data'}});
-
+</%init>
+<%perl>
   #### get rows ####
-
-  my @rows;
-
-  my $sth = $h->prepare($query_limit);
-  $sth->execute(@{%q->{'query_limit_data'}});
-
-  while (my @row = $sth->fetchrow_array()) {
-    push @rows, \@row;
-  }
+  my $rows = $h->selectall_arrayref($query_limit, undef, @{%q->{'query_limit_data'}});
 
   my %src = (
     sEcho => $.sEcho,
     iTotalRecords => $iTotalRecords,
     iTotalDisplayRecords => $iTotalDisplayRecords,
-    aaData => \@rows
+    aaData => $rows
   );
-</%init>
-<%perl>
- $m->send_json( \%src );
+
+  $m->send_json( \%src );
 </%perl>

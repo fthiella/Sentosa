@@ -26,14 +26,18 @@ $(document).ready(function() {
     function actions(form, action1, action2) {
 
         switch (action1) {
+        case undefined: break;
         case "save":
-            console.log(form.attr('action') + '&button=save&' + $('.form-control', form).serialize());
-            console.log("Is dirty? " + $("#is_dirty", form).val());
             if ($("#is_dirty", form).val() === "1") {
-              /* SAVE */
+                /* SAVE */
                 $.getJSON(form.attr('action'), $('.form-control', form).formObject({ button: "save" }), function(res) {
                     if (res["_status"] === "OK") {
                         $('input#is_dirty', form).val('');
+                        
+                        /* if pk and last insert id are defined, update the pk field */ 
+                        if ((typeof res["pk"] !== 'undefined') && (typeof res["last_insert_id"] !== 'undefined')) {
+                            $('input#'+res["pk"]).val(res["last_insert_id"]);
+                        }
                         /* proceed with next action */
                         actions(form, action2, undefined);
                     } else {
@@ -125,7 +129,6 @@ $(document).ready(function() {
 
 
         $("tfoot input", table).each(function (n) {
-            console.dir($(this));
             aoColumnDefs.push(
                 {"sName": $(this).attr('name'), "bVisible": ($(this).attr('type') || 'text') === 'text', "aTargets": [ n ] }
             );

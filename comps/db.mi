@@ -1,13 +1,13 @@
 <%doc>
 Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, etc.
 </%doc>
+<%flags>
+extends => undef
+</%flags>
 <%class>
   has '_id'; # id of the object
   has 'button';
 </%class>
-<%flags>
-  extends => undef;
-</%flags>
 <%init>
   use feature qw( switch );
   use Poet qw($log);
@@ -17,39 +17,39 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
   
   my ($obj) = Sentosa::Objects::get_object($._id, 'form', $m->session->{auth_id});
   if (!$obj) { $m->not_found(); }; # form not found
+  my ($columns) = Sentosa::Objects::parse_object($obj);
 
-  my $columns = JSON->new->utf8->decode($obj->{def});
-  
-  # create a lookup table, it will make things easier later
-  my %columns_lookup;
-  my $i=0;
-  foreach my $c (@{$columns}) {
-    $columns_lookup{$c->{col}} = $i++;
-  }
-
-  # adds pk info to the columns data structure
-  my $i=0;
-  foreach my $k (split ',', $obj->{pk}) {
-    ${$columns}[ %columns_lookup->{$k} ]{'pk'} = $i++;
-  }
   my $db = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
-
-  my @columns = ();
-  my @values = ();
 
   my @pk_values = map { $.args->{$_->{col}} } grep { defined $_->{pk} } @{$columns};
 
+  for (my $i=0; $i<scalar @{$columns}; $i++) {
+    @{$columns}[$i]->{new} = $.args->{@{$columns}[$i]->{col}} if ($.args->{@{$columns}[$i]->{col}});
+  }
+
   if ($.button eq 'save') {
-    # get all column names, and POSTed values (TODO: separate pk from non-pk?)
-  
-    foreach my $col (map { $_->{col} } @{$columns}) {
-      # TODO: how to distinguish between UPDATE and INSERT ? Save on a new record is INSERT, otherwise UPDATE. Client side?
-        push @columns, $col->{col};
-        push @values, $.args->{ $col->{col} };
+    my %q = Sentosa::Db::insertUpdateQuery(
+      $obj->{source},
+      $columns,
+      $db->{Driver}->{Name}
+    );
+
+    my $sth = $db->prepare($q{'query'});
+    my %j;
+
+    if ($q{'query_type'} eq 'INSERT') {
+      %j = (
+        '_status' => ($sth->execute(@{$q{'query_data'}}))?'OK':'Error',
+        'pk' => (0+@pk_values == 1)? map { $_->{col} } grep { defined $_->{pk} } @{$columns}:undef,
+        'last_insert_id' => $db->last_insert_id(undef, undef, undef, undef)
+      );
+    } else {
+      %j = (
+        '_status' => ($sth->execute(@{$q{'query_data'}}))?'OK':'Error'
+      );
     }
 
-    # TODO: fix here
-    # UPDATE it if ID is given, otherwise INSERT it
+    $m->send_json( \%j );
   } else {
     my $order;
     my $move;
@@ -57,24 +57,18 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
     given ($.button) {
       when ('primo') { # first OR goto
         $order = 'ASC';
-        if ($.args->{'goto_record'} ne '') {
-          $move = { move => 'goto', pk => [$.args->{'goto_record'}] }
-        }
+        if ($.args->{'goto_record'} ne '') { $move = { move => 'goto', pk => [$.args->{'goto_record'}] } }
       }
       when ('ultimo') {
         $order = 'DESC';
       }
       when ('indietro') {
         $order = 'DESC';
-        if ((@pk_values)) {
-          $move = { move => 'backwards', pk => [@pk_values] }
-        }
+        if ((@pk_values)) { $move = { move => 'backwards', pk => [@pk_values] } }
       }
       when ('avanti') {
         $order = 'ASC';
-        if ((@pk_values)) {
-          $move = { move => 'forwards', pk => [@pk_values] }
-        }
+        if ((@pk_values)) { $move = { move => 'forwards', pk => [@pk_values] } }
       }
     }
 
@@ -89,18 +83,7 @@ Operazioni sul database, chiamate dal form ajax: lettura records, spostamento, e
       $h->{Driver}->{Name}
     );
 
-    my $sth = $db->prepare(%q->{'query_limit'});
-    $sth->execute(@{%q->{'query_limit_data'}});
-    my $values = $sth->fetchrow_hashref();
-    $sth->finish();
-
-    my %j = ();
-
-    if ( $values ) { # TODO: check somehow if the query succeeded
-      foreach my $col (map { $_->{col} } @{$columns}) {
-        $j{ $col } = $$values{ $col };
-      }
-      $m->send_json( \%j );
-    }
+    my $j = $db->selectrow_hashref(%q->{'query_limit'}, undef, @{%q->{'query_limit_data'}});
+    if ($j) { $m->send_json( $j ); }
   }
 </%init>

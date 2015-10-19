@@ -14,11 +14,29 @@
   use Sentosa::Objects;
   use Sentosa::Db;
 
-  my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
-  if (!$obj) { $m->not_found(); }; # form not found
+  my ($obj) = {
+    db => 'dbi:SQLite:dbname=data/sentosa.db',
+    def => '[
+  {"box": "box1", "col": "id", "params": null, "caption": "id", "type": "hidden"},
+  {"box": "box2", "col": "username", "params": null, "caption": "User Name", "type": "text" },
+  {"box": "box2", "col": "password", "params": null, "caption": "Password", "type": "text" }
+]',
+    description => 'Users Form',
+    id => 1,
+    name => 'Users',
+    password => '',
+    pk => 'id',
+    source => 'af_users',
+    username => ''
+  };
+
+  print dh $obj;
   
   # array of hashes @{$columns} one hash for each column
   my $columns = JSON->new->utf8->decode($obj->{def});
+
+  print dh $obj;
+  print dh $columns;
   
   # create a lookup table, it will make things easier later
   my %columns_lookup;
