@@ -1,8 +1,4 @@
 package Sentosa::Db;
-use Poet::Moose;
-extends 'Poet::Import';
-
-use Poet qw($dbh);
 
 use feature "switch";
 

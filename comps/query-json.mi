@@ -1,0 +1,51 @@
+<%flags>
+extends => undef;
+</%flags>
+
+<%class>
+  has '_id';
+  has '_col';
+</%class>
+
+<%init>
+  use Sentosa::Objects;
+  use Sentosa::Db;
+
+  my ($obj) = Sentosa::Objects::get_object($._id, 'form', $m->session->{auth_id});
+  if (!$obj) { $m->not_found(); }; # form not found
+  my ($objcolumns) = Sentosa::Objects::parse_object($obj);
+
+  # stops at first match... not too elegant ;)
+  my ($query_id) = map { $_->{'query-source'} } grep { defined $_->{'query-source'} } @{$objcolumns};
+
+  my ($qry) = Sentosa::Objects::get_object($query_id, 'query', $m->session->{auth_id});
+  if (!$qry) { $m->not_found(); }; # form not found
+  my ($columns) = Sentosa::Objects::parse_object($qry);
+
+  my $h = DBI->connect($qry->{db}, $qry->{username}, $qry->{password}) or die("connection to ".$qry->{db}." error.\n");
+  my %q = Sentosa::Db::selectQuery(
+    $qry->{source},
+    $columns,
+    'ASC',
+    {},
+    undef,
+    undef,
+    $h->{Driver}->{Name}
+  );
+  my $query_limit    = %q->{'query_limit'};
+</%init>
+<%perl>
+  #### get rows ####
+  # { Slice => {} } get array of rows where each row is stored as a hash
+  # http://search.cpan.org/~timb/DBI-1.634/DBI.pm#selectall_arrayref
+  my @rows = map {
+    { 'id' => $_->{TrackId}, 'text' => $_->{Name} }
+  } @{$h->selectall_arrayref($query_limit, { Slice => {} }, @{%q->{'query_limit_data'}})};
+
+  my %j = (
+    'results' => \@rows,
+    'more' => 'false'
+  );
+
+  $m->send_json( \%j );
+</%perl>

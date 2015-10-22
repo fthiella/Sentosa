@@ -176,7 +176,15 @@ $(document).ready(function() {
 
     /* initialize all selects */
     $('select').each(function () {
-        $(this).select2();
+        $(this).select2({
+            ajax: {
+                dataType: "json",
+                url: "http://localhost:5000/admin/query-json/7/ArtistId",
+                results: function (data) {
+                    return {results: data};
+                }
+            }
+        });
     });
 
 });
