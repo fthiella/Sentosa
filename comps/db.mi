@@ -28,24 +28,24 @@ extends => undef
   }
 
   if ($.button eq 'save') {
-    my %q = Sentosa::Db::insertUpdateQuery(
+    my $q = Sentosa::Db::insertUpdateQuery(
       $obj->{source},
       $columns,
       $db->{Driver}->{Name}
     );
 
-    my $sth = $db->prepare($q{'query'});
+    my $sth = $db->prepare($q->{'query'});
     my %j;
 
-    if ($q{'query_type'} eq 'INSERT') {
+    if ($q->{'query_type'} eq 'INSERT') {
       %j = (
-        '_status' => ($sth->execute(@{$q{'query_data'}}))?'OK':'Error',
+        '_status' => ($sth->execute(@{$q->{'query_data'}}))?'OK':'Error',
         'pk' => (0+@pk_values == 1)? map { $_->{col} } grep { defined $_->{pk} } @{$columns}:undef,
         'last_insert_id' => $db->last_insert_id(undef, undef, undef, undef)
       );
     } else {
       %j = (
-        '_status' => ($sth->execute(@{$q{'query_data'}}))?'OK':'Error'
+        '_status' => ($sth->execute(@{$q->{'query_data'}}))?'OK':'Error'
       );
     }
 
@@ -73,7 +73,7 @@ extends => undef
     }
 
     my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
-    my %q = Sentosa::Db::selectQuery(
+    my $q = Sentosa::Db::selectQuery(
       $obj->{source},
       $columns,
       $order,
@@ -83,7 +83,7 @@ extends => undef
       $h->{Driver}->{Name}
     );
 
-    my $j = $db->selectrow_hashref(%q->{'query_limit'}, undef, @{%q->{'query_limit_data'}});
+    my $j = $db->selectrow_hashref($q->{'query_limit'}, undef, @{$q->{'query_limit_data'}});
     if ($j) { $m->send_json( $j ); }
   }
 </%init>

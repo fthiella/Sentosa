@@ -30,7 +30,7 @@ extends => undef;
   }
 
   my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
-  my %q = Sentosa::Db::selectQuery(
+  my $q = Sentosa::Db::selectQuery(
     $obj->{source},
     $columns,
     'ASC',
@@ -40,11 +40,13 @@ extends => undef;
     $h->{Driver}->{Name}
   );
 
+  dc $q;
+
 #  #################################################################
   
-  my $query          = %q->{'query'};
-  my $query_filt     = %q->{'query_search'};
-  my $query_limit    = %q->{'query_limit'};
+  my $query          = $q->{'query'};
+  my $query_filt     = $q->{'query_search'};
+  my $query_limit    = $q->{'query_limit'};
 
   my $query_cnt_all  = "SELECT COUNT(*) AS rows FROM ($query) q\n";
   my $query_cnt_filt = "SELECT COUNT(*) AS rows FROM ($query_filt) q\n";
@@ -52,12 +54,12 @@ extends => undef;
   #### get number of unfiltered rows ####
 
   # get number of total rows, and number of total filtered rows
-  my ($iTotalRecords) = $h->selectrow_array($query_cnt_all, undef, @{%q->{'query_data'}});
-  my ($iTotalDisplayRecords) = $h->selectrow_array($query_cnt_filt, undef, @{%q->{'query_search_data'}});
+  my ($iTotalRecords) = $h->selectrow_array($query_cnt_all, undef, @{$q->{'query_data'}});
+  my ($iTotalDisplayRecords) = $h->selectrow_array($query_cnt_filt, undef, @{$q->{'query_search_data'}});
 </%init>
 <%perl>
   #### get rows ####
-  my $rows = $h->selectall_arrayref($query_limit, undef, @{%q->{'query_limit_data'}});
+  my $rows = $h->selectall_arrayref($query_limit, undef, @{$q->{'query_limit_data'}});
 
   my %src = (
     sEcho => $.sEcho,

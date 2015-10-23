@@ -1,62 +1,59 @@
 package Sentosa::Db;
 
+use strict;
+use warnings;
 use feature "switch";
+no warnings 'experimental::smartmatch';
+our $VERSION = '0.10';
+
+#our $SELF = __PACKAGE__->new;
+
+my $DBMS_MAP = {
+    'SQLite' => {
+        DELIMITER  => ',',
+        QUOTE      => '"',
+        SEARCH_MAP => {
+            '='    => '%s=?',
+            'LIKE' => '%s LIKE ? || \'%\'',
+            'SUB'  => '%s LIKE \'%\' || ? || \'%\'',
+        },
+        LIMIT => 'LIMIT %1$s, %2$s',
+    },
+    'Pg' => {
+        DELIMITER  => ',',
+        QUOTE      => '"',
+        SEARCH_MAP => {
+            '='    => '%s=?',
+            'LIKE' => '%s LIKE ? || \'%\'',
+            'SUB'  => '%s LIKE \'%\' || ? || \'%\'',
+        },
+        LIMIT => 'LIMIT %2$s OFFSET %1$s',
+    },
+    'mysql' => {
+        DELIMITER    => ',',
+        QUOTE      => '`',
+        SEARCH_MAP => {
+            '='    => '%s=?',
+            'LIKE' => '%s LIKE CONCAT(?,\'%\')',
+            'SUB'  => '%s LIKE CONCAT(?,\'%\')',
+        },
+        LIMIT => 'LIMIT %1$s, %2$s',
+    },
+};
 
 sub whereFilter {
   my ($col, $searchcriteria, $dbms) = @_;
 
-  my $ck;
-
-  given ($dbms) {
-
-    when ('SQLite') {
-      given ($searchcriteria) {
-        when ('=')    { $ck = "$col=?"; }
-        when ('LIKE') { $ck = "$col LIKE ? || '%'"; }
-        when ('SUB')  { $ck = "$col LIKE '%' || ? || '%'"; }
-        when (undef)  { $ck = "$col LIKE ? || '%'"; }
-      }
-    }
-
-    when ('Pg') {
-      given ($searchcriteria) {
-        when ('=')    { $ck = "$col=?"; }
-        when ('LIKE') { $ck = "$col LIKE ? || '%'"; }
-        when ('SUB')  { $ck = "$col LIKE '%' || ? || '%'"; }
-        when (undef)  { $ck = "$col LIKE ? || '%'"; }
-      }
-    }
-
-    when ('mysql') {
-      given ($searchcriteria) {
-        when ('=')    { $ck = "$col=?"; }
-        when ('LIKE') { $ck = "$col LIKE CONCAT(?,'%')"; }
-        when ('SUB')  { $ck = "$col LIKE CONCAT('%',?,'%')"; }
-        when (undef)  { $ck = "$col LIKE CONCAT(?,'%')"; }
-      }
-    }
-  }
-
-  return $ck;
+  return sprintf $DBMS_MAP->{$dbms}->{SEARCH_MAP}->{$searchcriteria // 'SUB'}, $col;
 }
 
 sub limitFilter {
   my ($start, $length, $dbms) = @_;
-  # TODO: check this sub - I'm not sure it's correct, haven't tested it yet
 
-  my $limit1;
-  my $limit2;
-
-  if (!$start) { $start=0; }
-  if (!$length) { $length=99; }
-
-  given ($dbms) {
-    when ('SQLite') { $limit2 = " LIMIT $start, $length"; }
-    when ('Pg')     { $limit2 = " LIMIT $length OFFSET $start"; }
-    when ('mysql')  { $limit2 = " LIMIT $start, $length"; }
-  }
-
-  return ($limit1, $limit2);
+  return (
+    sprintf $DBMS_MAP->{$dbms}->{TOP}, $start // 0, $length // 99,
+    sprintf $DBMS_MAP->{$dbms}->{LIMIT}, $start // 0, $length // 99
+  );
 }
 
 sub pk_conditions {
@@ -71,7 +68,7 @@ sub pk_conditions {
   my @pk_conditions;
   my @pk_conditions_data;
 
-  if ($o{$move}) {
+  if ($o{$move // ''}) {
 
     for (my $i= (0+@{$pk_columns}) - 1; $i>=0; $i--) {
       my @or_conditions = (
@@ -96,8 +93,14 @@ sub pk_conditions {
 sub selectQuery {
   my ($source, $columns, $order, $goto, $start, $length, $dbms) = @_;
 
+  my $C = $DBMS_MAP->{$dbms};
+
   # get all column names from the columns array
-  my @sc = map { $_->{col} } @{$columns}; # TODO: better to use column qualifier
+  my @sc = map {
+    $C->{QUOTE} . $source . $C->{QUOTE}.
+    '.'.
+    $C->{QUOTE} . $_->{col} . $C->{QUOTE}
+  } grep { defined $_->{col} } @{$columns};
 
   # Filter: filter table (for example by username)
   # Search: search within filtered table
@@ -105,15 +108,15 @@ sub selectQuery {
   # - grep gets all columns that have to be filtered
   # - map creates "field=?" or "fields LIKE ?" etc.
 
-  my @filter = map { whereFilter($_->{col}, $_->{searchcriteria}, $dbms) } grep { defined $_->{filter} } @{$columns};
-  my @search = map { whereFilter($_->{col}, $_->{searchcriteria}, $dbms) } grep { defined $_->{search} } @{$columns};
+  my @filter = map { whereFilter($C->{QUOTE}.$source.$C->{QUOTE}.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{filter} } @{$columns};
+  my @search = map { whereFilter($C->{QUOTE}.$source.$C->{QUOTE}.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{search} } @{$columns};
 
-  my @filter_data =   (map { $_->{filter} }              grep { defined $_->{filter} } @{$columns});
-  my @filter_search = (map { $_->{search} }              grep { defined $_->{search} } @{$columns});
+  my @filter_data =   (map { $_->{filter} } grep { defined $_->{filter} } @{$columns});
+  my @filter_search = (map { $_->{search} } grep { defined $_->{search} } @{$columns});
 
   # TODO: pk columns should be ordered (pk asc)
-  my @order_by =      (map { $_->{col}." ".$_->{order} } grep { defined $_->{order}  } @{$columns});
-  my @order_by_pk =   (map { $_->{col}." $order" }       grep { defined $_->{pk}     } @{$columns});
+  my @order_by =      (map { $C->{QUOTE}.$source.$C->{QUOTE}.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}." ".$_->{order} } grep { defined $_->{order}  } @{$columns});
+  my @order_by_pk =   (map { $C->{QUOTE}.$source.$C->{QUOTE}.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}." $order" }       grep { defined $_->{pk}     } @{$columns});
 
 
   my ($pk_conditions, $pk_conditions_data) = pk_conditions(
@@ -124,20 +127,66 @@ sub selectQuery {
 
   my ($limit1, $limit2) = limitFilter($start, $length, $dbms);
 
-  return (
-    'query' => 'SELECT '.join(',', @sc)." FROM $source". (((@filter) || (defined $pk_conditions))?' WHERE '.join(' AND ', grep defined, (@filter, $pk_conditions)):undef),
+  my $query;
+  my $query_search;
+  my $query_limit;
+
+  # query
+
+  $query = "SELECT\n";
+  $query .= join(",\n", map { '  '.$_ } @sc) . "\n";
+  $query .= "FROM\n";
+  $query .= sprintf '  '.$C->{QUOTE}.'%s'.$C->{QUOTE}."\n", $source;
+  if (defined $pk_conditions) {
+    $query .= "WHERE\n  ";
+    $query .= join("\n  AND ", grep defined, (@filter, $pk_conditions));
+  }
+  $query .= ";\n";
+
+  # query_search
+
+  $query_search = "SELECT\n";
+  $query_search .= join(",\n", map { '  '.$_ } @sc) . "\n";
+  $query_search .= "FROM\n";
+  $query_search .= sprintf '  '.$C->{QUOTE}.'%s'.$C->{QUOTE}."\n", $source;
+  if ((@filter) || (defined $pk_conditions) || (@search)) {
+    $query_search .= "WHERE\n";
+    $query_search .= '  '.join("\n  AND ", grep defined, (@filter, $pk_conditions, @search))."\n";
+  }
+  $query_search .= ";\n";
+
+  # query_limit
+
+  $query_limit = "SELECT\n";
+  if ($limit1) {
+    $query_limit .= "  $limit1\n";
+  }
+  $query_limit .= join(",\n", map { '  '.$_ } @sc) . "\n";
+  $query_limit .= "FROM\n";
+  $query_limit .= sprintf '  '.$C->{QUOTE}.'%s'.$C->{QUOTE}."\n", $source;
+  if ((@filter) || (defined $pk_conditions) || (@search)) {
+    $query_limit .= "WHERE\n";
+    $query_limit .= '  '.join("\n  AND ", grep defined, (@filter, $pk_conditions, @search))."\n";
+  }
+  if ((@order_by) || (@order_by_pk)) {
+    $query_limit .= "ORDER BY\n";
+    $query_limit .= '  '.join("\n,  ", @order_by, @order_by_pk)."\n";
+  }
+  if ($limit2) {
+    $query_limit .= "$limit2\n";
+  }
+  $query_limit .= ";\n";
+
+  return {
+    'query' => $query,
     'query_data' => [@filter_data, @{$pk_conditions_data}],
 
-    'query_search' => 'SELECT '.join(',', @sc)." FROM $source". (((@filter) || (defined $pk_conditions) || (@search))?' WHERE '.join(' AND ', grep defined, (@filter, $pk_conditions, @search)):undef),
+    'query_search' => $query_search,
     'query_search_data' => [@filter_data, @{$pk_conditions_data}, @filter_search],
 
-    'query_limit' =>
-      'SELECT '.$limit1.' '.join(',', @sc).
-      " FROM $source". (((@filter) || (defined $pk_conditions) || (@search))?' WHERE '.join(' AND ', grep defined, (@filter, $pk_conditions, @search)):undef).
-      " ORDER BY ".join(',', @order_by, @order_by_pk).
-      "$limit2",
+    'query_limit' => $query_limit,
     'query_limit_data' => [@filter_data, @{$pk_conditions_data}, @filter_search]
-  );
+  };
 }
 
 sub insertUpdateQuery {
@@ -145,6 +194,8 @@ sub insertUpdateQuery {
   # TODO: what if a primary key is not auto_increment (or is multiple fields?)
   #       need to distinguish between insert and update, but client side
   my ($source, $columns, $dbms) = @_;
+
+  my $C = $DBMS_MAP->{$dbms};
 
   # get new columns, and new values
   my @nc = map { $_->{col} } grep { (defined $_->{new}) && (!defined $_->{pk})} @{$columns};
@@ -155,24 +206,30 @@ sub insertUpdateQuery {
   my @pkc = map { $_->{col} } grep { (defined $_->{new}) && (defined $_->{pk})} @{$columns};
   my @pkv = map { $_->{new} } grep { (defined $_->{new}) && (defined $_->{pk})} @{$columns};
 
-  return (
-    'query' =>
-      (@pkv)?
-      "UPDATE $source SET ".
-      join(',', map { $_.'=?'} @nc).' '.
-      'WHERE '.
-      join(',', map { $_.'=?'} @pkc)
-      :
-      "INSERT INTO $source (".
-      join(',', @nc).
-      ') VALUES ('.
-      join(',', (map { '?' } @nc) ).
-      ')',
-    'query_data' =>
-      [@nv, @pkv],
-    'query_type' =>
-      (@pkv)?'UPDATE':'INSERT'
-  );
+  my $query;
+
+  if (@pkv) {
+    $query  = "UPDATE\n";
+    $query .= '  '.$C->{QUOTE}.$source.$C->{QUOTE}."\n";
+    $query .= "SET\n";
+    $query .= '  '.join(",\n", map { $C->{QUOTE}.$_.$C->{QUOTE}.'=?'} @nc)."\n";
+    $query .= "WHERE\n";
+    $query .= '  '.join(",\n", map { $C->{QUOTE}.$_.$C->{QUOTE}.'=?'} @pkc)."\n";
+    $query .= ";\n";
+  } else {
+    $query  = "INSERT INTO\n";
+    $query .= '  '.$C->{QUOTE}.$source.$C->{QUOTE}." ";
+    $query .= '('.join(',', map { $C->{QUOTE}.$_.$C->{QUOTE} } @nc).")\n";
+    $query .= "VALUES\n";
+    $query .= '  ('.join(',', (map { '?' } @nc) ).")\n";
+    $query .= ";\n";
+  }
+
+  return {
+    'query'      => $query,
+    'query_data' => [@nv, @pkv],
+    'query_type' => (@pkv)?'UPDATE':'INSERT'
+  };
 }
 
 1;

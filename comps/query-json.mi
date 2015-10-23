@@ -15,16 +15,16 @@ extends => undef;
   if (!$obj) { $m->not_found(); }; # form not found
   my ($objcolumns) = Sentosa::Objects::parse_object($obj);
 
-  # stops at first match... not too elegant ;)
-  my ($query_id) = map { $_->{'query-source'} } grep { defined $_->{'query-source'} } @{$objcolumns};
+  my $columns = [
+    { col => 'TrakId' },
+    { col => 'Name' }
+  ];
 
-  my ($qry) = Sentosa::Objects::get_object($query_id, 'query', $m->session->{auth_id});
-  if (!$qry) { $m->not_found(); }; # form not found
-  my ($columns) = Sentosa::Objects::parse_object($qry);
+  dc $columns;
 
   my $h = DBI->connect($qry->{db}, $qry->{username}, $qry->{password}) or die("connection to ".$qry->{db}." error.\n");
   my %q = Sentosa::Db::selectQuery(
-    $qry->{source},
+    'Track',
     $columns,
     'ASC',
     {},

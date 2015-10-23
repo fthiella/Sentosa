@@ -124,7 +124,7 @@
     		  when ('textarea') { print $.input_textarea($element->{col}, $element->{caption}, ''); }
           when ('checkbox') { print $.input_checkbox($element->{col}, $element->{caption}, ''); }
     		  when ('file')		{ print $.input_file($element->{col}, $element->{caption}, ''); }
-          when ('query')    { print $.query($element->{col}, $element->{caption}, $element->{params}, '1', '1', '1'); }
+          when ('query')    { print $.query($element->{query}, $element->{caption}, $element->{params}, '1', '1', '1'); }
 		  when (undef) { print $.input_text($element->{col}, $element->{caption}, ''); }
         }
  
