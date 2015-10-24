@@ -63,8 +63,25 @@ $(document).ready(function() {
                 form.attr('action'),
                 $('input#goto_record', form).formObject($.extend({}, pk_obj, { button: action1})),
                 function(res) {
-                    $.each(res, function(key, val) { /* TODO: disable is_dirty, and don't always call change! */
-                        $('#' + key, form).val(val).change();
+                    $.each(res, function(key, val) {
+                        /* TODO: disable is_dirty, and don't always call change! */
+
+                        /* if it's a select2 component add the option before setting the default value */
+                        /* TODO: this looks more like an "hack" than real production code.. there's a lot to be fixed here */
+                        if ($('#' + key, form).attr('class') === 'form-control select2-hidden-accessible') {
+                            $('#' + key + ' option:selected', form).remove();
+                            console.log($('#' + key, form).attr('data-json'));
+                            $.getJSON(
+                                $('#' + key, form).attr('data-json'),
+                                { id: val },
+                                function(res) {
+                                    $('#' + key, form).append('<option value="'+res["results"][0]["id"]+'" selected>'+res["results"][0]["text"]+'</option>');
+                                    $('#' + key, form).val(res["results"][0]["id"]).change();
+                                }
+                            );
+                        } else {
+                            $('#' + key, form).val(val).change();
+                        }
                     });
                     $("#is_dirty", form).val(0);
                 }
@@ -175,11 +192,12 @@ $(document).ready(function() {
     });
 
     /* initialize all selects */
+    /* https://github.com/select2/select2/issues/3116#issuecomment-102119431 */
     $('select').each(function () {
         $(this).select2({
             ajax: {
-                dataType: "json",
                 url: "http://localhost:5000/admin/query-json/7/ArtistId",
+                dataType: "json",
                 results: function (data) {
                     return {results: data};
                 }

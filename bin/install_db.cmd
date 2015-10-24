@@ -13,12 +13,12 @@ IF EXIST db\sentosa.custom.sql (
   sqlite3 -batch data\sentosa.db < db\sentosa.custom.sql
 )
 
-#IF EXIST data\chinook.db (
-#  ECHO Removing old chinook.db ...
-#  DEL data\chinook.db
-#)
+IF EXIST data\chinook.db (
+  ECHO Removing old chinook.db ...
+  DEL data\chinook.db
+)
 
-#ECHO Importing chinook.sql ...
-#sqlite3 -batch data\chinook.db < db\chinook.sql
+ECHO Importing chinook.sql ...
+sqlite3 -batch data\chinook.db < db\chinook.sql
 
 ECHO Done!

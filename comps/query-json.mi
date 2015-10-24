@@ -15,16 +15,16 @@ extends => undef;
   if (!$obj) { $m->not_found(); }; # form not found
   my ($objcolumns) = Sentosa::Objects::parse_object($obj);
 
+  my ($opt) = map { $_->{options} } grep { ($_->{type} eq 'select2') && ($_->{col} eq $._col) } @{$objcolumns};
+
   my $columns = [
-    { col => 'TrakId' },
-    { col => 'Name' }
+    { col => $opt->{id},   search => $.args->{id}, searchcriteria => '='   },
+    { col => $opt->{text}, search => $.args->{q},  searchcriteria => 'SUB' }
   ];
 
-  dc $columns;
-
-  my $h = DBI->connect($qry->{db}, $qry->{username}, $qry->{password}) or die("connection to ".$qry->{db}." error.\n");
-  my %q = Sentosa::Db::selectQuery(
-    'Track',
+  my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
+  my $q = Sentosa::Db::selectQuery(
+    $opt->{source},
     $columns,
     'ASC',
     {},
@@ -32,20 +32,26 @@ extends => undef;
     undef,
     $h->{Driver}->{Name}
   );
-  my $query_limit    = %q->{'query_limit'};
+  my $query_limit    = $q->{'query_limit'};
 </%init>
 <%perl>
   #### get rows ####
   # { Slice => {} } get array of rows where each row is stored as a hash
   # http://search.cpan.org/~timb/DBI-1.634/DBI.pm#selectall_arrayref
-  my @rows = map {
-    { 'id' => $_->{TrackId}, 'text' => $_->{Name} }
-  } @{$h->selectall_arrayref($query_limit, { Slice => {} }, @{%q->{'query_limit_data'}})};
+  my @rows = 
+    map {
+      {
+        'id'   => $_->{$opt->{id}},
+        'text' => $_->{$opt->{text}}
+      }
+    } @{$h->selectall_arrayref($query_limit, { Slice => {} }, @{$q->{'query_limit_data'}})};
 
   my %j = (
     'results' => \@rows,
     'more' => 'false'
   );
+
+  dc $.args;
 
   $m->send_json( \%j );
 </%perl>
