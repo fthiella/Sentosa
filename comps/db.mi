@@ -84,6 +84,14 @@ extends => undef
     );
 
     my $j = $db->selectrow_hashref($q->{'query_limit'}, undef, @{$q->{'query_limit_data'}});
-    if ($j) { $m->send_json( $j ); }
+
+    if ($j) {
+      # $m->send_json( $j );
+      $m->clear_buffer;
+      # $m->print(JSON::XS::encode_json(\%j));
+      $m->print(JSON::XS->new->encode($j));
+      $m->res->content_type("application/json");
+      $m->abort();
+    }
   }
 </%init>

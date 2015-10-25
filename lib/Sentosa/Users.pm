@@ -14,7 +14,7 @@ sub get_userinfo {
   my ($id) = @_;
   
   my $ar = $dbh->selectall_arrayref(
-    "SELECT id, username
+    "SELECT id, username, userdesc
     FROM af_users
     WHERE id=?",
     {Slice => {}},

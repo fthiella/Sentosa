@@ -1,7 +1,9 @@
 <%class>
 </%class>
+<h1>Welcome to Sentosa Autoforms</h1>
+<img src="/static/images/cartoon-forms.jpg">
 <p>
-You are logged in as <% $m->session->{auth_id} || 'Guest' %>.
+You are logged in as <strong><% Sentosa::Users::get_userinfo($m->session->{auth_id}) || 'Guest' %></strong>.
 </p>
 
 <p>

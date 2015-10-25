@@ -2,6 +2,8 @@
 -- Internal tables
 -- --------------------------------------------------------
 
+PRAGMA encoding = "UTF-8";
+
 -- af_info: application info, version, etc.
 create table if not exists af_info (
   id integer primary key autoincrement,
@@ -20,13 +22,14 @@ insert into af_info (attribute, value) values
 -- af_users: usernames and passwords
 create table if not exists af_users (
   id integer primary key autoincrement,
-  username varchar(200) NOT NULL,
+  username varchar(200) NOT NULL UNIQUE,
+  userdesc varchar(200) NOT NULL,
   password varchar(200) NOT NULL
 );
 
-insert into af_users (id, username, password) values
-(1, 'admin', 'password'),
-(2, 'user',  'password');
+insert into af_users (id, username, userdesc, password) values
+(1, 'admin', 'Sentosa Administrator', 'password'),
+(2, 'user',  'Standard User',         'password');
 
 -- af_groups: groups
 create table if not exists af_groups (
@@ -133,15 +136,23 @@ insert into af_objects values
   {"col": "groupname", "caption": "Groupname"}
 ]'),
 
--- --------------------
--- Sample Application
--- --------------------
+-- --------------------------
+-- Sample Application Chinook
+-- --------------------------
+
+--(5, 2, 'form', 'Album', 2, 'Album', 'AlbumId', 'Albums Form',
+--'[
+--  {"box": "box1", "col": "AlbumId", "params": null, "caption": "AlbumId", "type": "hidden"},
+--  {"box": "box2", "col": "Title", "params": null, "caption": "Album Title", "type": "text"},
+--  {"box": "box2", "col": "ArtistId", "params": null, "caption": "Artist", "type": "select", "options": [{"id": "1", "option": "Ac/Dc"}, {"id": "2", "option": "Accept"}, {"id": "3", "option": "Aerosmith"}]},
+--  {"box": "box3", "query": "6", "params": "q.AlbumId=f.AlbumId", "caption": "Tracks", "type": "query"}
+--]'),
 
 (5, 2, 'form', 'Album', 2, 'Album', 'AlbumId', 'Albums Form',
 '[
   {"box": "box1", "col": "AlbumId", "params": null, "caption": "AlbumId", "type": "hidden"},
   {"box": "box2", "col": "Title", "params": null, "caption": "Album Title", "type": "text"},
-  {"box": "box2", "col": "ArtistId", "params": null, "caption": "Artist", "type": "select", "options": [{"id": "1", "option": "Ac/Dc"}, {"id": "2", "option": "Accept"}, {"id": "3", "option": "Aerosmith"}]},
+  {"box": "box2", "col": "ArtistId", "params": null, "caption": "Artist", "type": "select2", "options": {"source": "Artist", "id": "ArtistId", "text": "Name"} },
   {"box": "box3", "query": "6", "params": "q.AlbumId=f.AlbumId", "caption": "Tracks", "type": "query"}
 ]'),
 

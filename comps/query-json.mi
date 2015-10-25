@@ -10,6 +10,7 @@ extends => undef;
 <%init>
   use Sentosa::Objects;
   use Sentosa::Db;
+  use utf8;
 
   my ($obj) = Sentosa::Objects::get_object($._id, 'form', $m->session->{auth_id});
   if (!$obj) { $m->not_found(); }; # form not found
@@ -53,5 +54,15 @@ extends => undef;
 
   dc $.args;
 
-  $m->send_json( \%j );
+  dc \%j;
+
+# the following line doesn't encode utf-8 correctly?
+# $m->send_json( \%j );
+# this answer helped me http://stackoverflow.com/a/31170871/833073
+
+  $m->clear_buffer;
+  # $m->print(JSON::XS::encode_json(\%j));
+  $m->print(JSON::XS->new->encode(\%j));
+  $m->res->content_type("application/json");
+  $m->abort();
 </%perl>
