@@ -1,6 +1,9 @@
 <%class>
   has '_app';
 </%class>
-<h1>Welcome to Sentosa</h1>
+<%init>
+  my $appinfo = Sentosa::Users::get_appinfo($m->session->{auth_id}, $._app);
+</%init>
+<h1><% $appinfo->{details} %></h1>
 
-This is the homepage of the app <% $._app %>
+<% $appinfo->{cover} %>

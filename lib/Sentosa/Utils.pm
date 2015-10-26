@@ -22,7 +22,7 @@ sub get_info {
   return undef;
 }
 
-sub get_appinfo {
+sub get_sentosainfo {
  return get_info('name').' '.get_info('version');
 }
 

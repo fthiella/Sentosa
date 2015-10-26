@@ -7,6 +7,7 @@ route "{_app:[a-z]+}/query-json/{_id:[0-9]+}/{_col:[a-zA-Z]+}", { _action=> 'que
 route "{_app:[a-z]+}/", { _action=> 'app' };
 </%class>
 <%init>
-  $.title($._app);
+  my $appinfo = Sentosa::Users::get_appinfo($m->session->{auth_id}, $._app);
+  $._title($appinfo->{details});
   $m->comp($._action.'.mi', %{$.args});
 </%init>

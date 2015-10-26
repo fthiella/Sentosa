@@ -1,9 +1,15 @@
-<%class>
-</%class>
-<h1>Welcome to Sentosa Autoforms</h1>
-<img src="/static/images/cartoon-forms.jpg">
+<%init>
+  use Sentosa::Utils;
+  use Data::Dumper;
+
+  $._title(Sentosa::Utils::get_sentosainfo);
+
+  my $user = Sentosa::Users::get_userinfo($m->session->{auth_id});
+</%init>
+% if ($user) {
+<h1>Welcome, <% $user->{userdesc} %></h1>
 <p>
-You are logged in as <strong><% Sentosa::Users::get_userinfo($m->session->{auth_id}) || 'Guest' %></strong>.
+<img src="/static/images/home.jpg">
 </p>
 
 <p>
@@ -13,20 +19,22 @@ Your groups are:
   <li><% $group->{groupname} %></li>
 % }
 </ul>
-
 </p>
+
+<p>
 Your apps are:
 <ul>
 % foreach my $app (Sentosa::Users::get_appsuserinfo($m->session->{auth_id})) {
   <li><% $app->{url} %></li>
 % }
 </ul>
+</p>
+% } else {
+<p>
+You are logged in as <strong>Guest</strong>. Please <a href="login">go to login page</a>!
+</p>
+% }
 <hr>
-
-<a href="login">Go to login page!</a>
-<%init>
-  use Sentosa::Utils;
-  use Data::Dumper;
-
-  $.title(Sentosa::Utils::get_appinfo);
-</%init>
+<p>
+<a href="https://github.com/fthiella/Sentosa">Sentosa Autoforms on GitHub</a>
+</p>

@@ -46,5 +46,5 @@
     }
   }
 
-  $.title(Sentosa::Utils::get_appinfo);
+  $._title(Sentosa::Utils::get_sentosainfo);
 </%init>

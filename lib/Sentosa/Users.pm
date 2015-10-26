@@ -13,19 +13,15 @@ B<Sentosa::Users> - routines for user authentication, and users and groups manag
 sub get_userinfo {
   my ($id) = @_;
   
-  my $ar = $dbh->selectall_arrayref(
+  my $ar = $dbh->selectrow_hashref(
     "SELECT id, username, userdesc
     FROM af_users
     WHERE id=?",
     {Slice => {}},
     $id
   );
- 
-  if ($ar->[0]->{id} eq $id) {
-   return $ar->[0]->{username};
-  }
 
- return undef;
+ return $ar;
 }
 
 sub get_groupsuserinfo {
@@ -63,6 +59,28 @@ sub get_appsuserinfo {
   );
 
  return @{ $ar }; # deference an array reference
+}
+
+sub get_appinfo {
+  my ($id, $app) = @_;
+  
+  my $ar = $dbh->selectrow_hashref(
+    "SELECT a.id, a.url, a.details, a.cover, a.image
+    FROM
+      af_apps a LEFT JOIN af_appgroups ag
+      ON a.id = ag.id_app
+      LEFT JOIN af_usergroups u
+      ON ag.id_group = u.id_group
+    WHERE
+      (u.id_user=? OR '1'=?)
+      AND a.url=?",
+    {Slice => {}},
+    $id,
+    $id,
+    $app
+  );
+
+ return $ar;
 }
 
 sub auth_user {

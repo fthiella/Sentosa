@@ -12,8 +12,8 @@ create table if not exists af_info (
 );
 
 insert into af_info (attribute, value) values
-('name', 'Sentosa AutoForms'),
-('version', '0.09');
+('name', 'Sentosa Autoforms'),
+('version', '0.10');
  
 -- --------------------------------------------------------
 -- Configuration Tables
@@ -59,12 +59,14 @@ insert into af_usergroups (id_user, id_group) values
 create table if not exists af_apps (
   id integer primary key autoincrement,
   url string,
-  details string
+  details string,
+  cover string,
+  image string
 );
 
-insert into af_apps (id, url, details) values
-(1, 'admin', 'Sentosa Management'),
-(2, 'chinhook', 'Chinook Sample Database');
+insert into af_apps (id, url, details, cover) values
+(1, 'admin', 'Sentosa Management', 'Users, groups and applications management.'),
+(2, 'chinhook', 'Chinook Sample Database', 'The Chinook Sample Database');
 
 -- af_appgroups: Applications to Groups
 create table if not exists af_appgroups (
@@ -161,12 +163,4 @@ insert into af_objects values
   {"box": "box1", "col": "TrackId",  "params": null, "caption": "TrackId",    "type": "hidden"},
   {"box": "box2", "col": "Name",     "params": null, "caption": "Track Name", "type": "text"},
   {"box": "box2", "col": "AlbumId",  "params": null, "caption": "Album",      "type": "hidden",   "searchcriteria": "="}
-]'),
-
-(7, 2, 'form', 'Album2', 2, 'Album', 'AlbumId', 'Albums Form 2',
-'[
-  {"box": "box1", "col": "AlbumId", "params": null, "caption": "AlbumId", "type": "hidden"},
-  {"box": "box2", "col": "Title", "params": null, "caption": "Album Title", "type": "text"},
-  {"box": "box2", "col": "ArtistId", "params": null, "caption": "Artist", "type": "select2", "options": {"source": "Artist", "id": "ArtistId", "text": "Name"} },
-  {"box": "box3", "query": "6", "params": "q.AlbumId=f.AlbumId", "caption": "Tracks", "type": "query"}
 ]');

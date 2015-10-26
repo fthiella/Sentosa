@@ -1,5 +1,5 @@
 <%class>
-has 'title';
+has '_title';
 has '_app';
 </%class>
 
@@ -14,7 +14,7 @@ has '_app';
     <meta name="description" content="">
     <meta name="author" content="">
 % $.Defer {{
-    <title><% $.title %></title>
+    <title><% $._title %></title>
 % }}
 
 <& head-includes.mi &>
@@ -28,7 +28,7 @@ has '_app';
         <!-- Navigation -->
         <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
 % $.Defer {{
-              <& widgets/navbar-header.mi, caption=>$.title &>
+              <& widgets/navbar-header.mi, caption=>$._title &>
 % }}
             <ul class="nav navbar-top-links navbar-right">
               <& widgets/dropdown-tasks.mc &>
