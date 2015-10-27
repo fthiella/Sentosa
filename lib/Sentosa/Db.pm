@@ -17,7 +17,7 @@ my $DBMS_MAP = {
             'LIKE' => '%s LIKE ? || \'%\'',
             'SUB'  => '%s LIKE \'%\' || ? || \'%\'',
         },
-        LIMIT => 'LIMIT %1$s, %2$s',
+        LIMIT => 'LIMIT %1$d, %2$d',
     },
     'Pg' => {
         DELIMITER  => ',',
@@ -27,7 +27,7 @@ my $DBMS_MAP = {
             'LIKE' => '%s LIKE ? || \'%\'',
             'SUB'  => '%s LIKE \'%\' || ? || \'%\'',
         },
-        LIMIT => 'LIMIT %2$s OFFSET %1$s',
+        LIMIT => 'LIMIT %2$d OFFSET %1$d',
     },
     'mysql' => {
         DELIMITER    => ',',
@@ -37,7 +37,7 @@ my $DBMS_MAP = {
             'LIKE' => '%s LIKE CONCAT(?,\'%\')',
             'SUB'  => '%s LIKE CONCAT(?,\'%\')',
         },
-        LIMIT => 'LIMIT %1$s, %2$s',
+        LIMIT => 'LIMIT %1$d, %2$d',
     },
 };
 
@@ -51,8 +51,8 @@ sub limitFilter {
   my ($start, $length, $dbms) = @_;
 
   return (
-    sprintf $DBMS_MAP->{$dbms}->{TOP}, $start // 0, $length // 99,
-    sprintf $DBMS_MAP->{$dbms}->{LIMIT}, $start // 0, $length // 99
+    (sprintf $DBMS_MAP->{$dbms}->{TOP}, $start, $length),
+    (sprintf $DBMS_MAP->{$dbms}->{LIMIT}, $start // 0, $length // 99)
   );
 }
 
@@ -141,7 +141,6 @@ sub selectQuery {
     $query .= "WHERE\n  ";
     $query .= join("\n  AND ", grep defined, (@filter, $pk_conditions));
   }
-  $query .= ";\n";
 
   # query_search
 
@@ -153,7 +152,6 @@ sub selectQuery {
     $query_search .= "WHERE\n";
     $query_search .= '  '.join("\n  AND ", grep defined, (@filter, $pk_conditions, @search))."\n";
   }
-  $query_search .= ";\n";
 
   # query_limit
 
@@ -175,7 +173,6 @@ sub selectQuery {
   if ($limit2) {
     $query_limit .= "$limit2\n";
   }
-  $query_limit .= ";\n";
 
   return {
     'query' => $query,
@@ -215,14 +212,12 @@ sub insertUpdateQuery {
     $query .= '  '.join(",\n", map { $C->{QUOTE}.$_.$C->{QUOTE}.'=?'} @nc)."\n";
     $query .= "WHERE\n";
     $query .= '  '.join(",\n", map { $C->{QUOTE}.$_.$C->{QUOTE}.'=?'} @pkc)."\n";
-    $query .= ";\n";
   } else {
     $query  = "INSERT INTO\n";
     $query .= '  '.$C->{QUOTE}.$source.$C->{QUOTE}." ";
     $query .= '('.join(',', map { $C->{QUOTE}.$_.$C->{QUOTE} } @nc).")\n";
     $query .= "VALUES\n";
     $query .= '  ('.join(',', (map { '?' } @nc) ).")\n";
-    $query .= ";\n";
   }
 
   return {

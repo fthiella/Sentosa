@@ -150,17 +150,17 @@ insert into af_objects values
 --  {"box": "box3", "query": "6", "params": "q.AlbumId=f.AlbumId", "caption": "Tracks", "type": "query"}
 --]'),
 
-(5, 2, 'form', 'Album', 2, 'Album', 'AlbumId', 'Albums Form',
-'[
-  {"box": "box1", "col": "AlbumId", "params": null, "caption": "AlbumId", "type": "hidden"},
-  {"box": "box2", "col": "Title", "params": null, "caption": "Album Title", "type": "text"},
-  {"box": "box2", "col": "ArtistId", "params": null, "caption": "Artist", "type": "select2", "options": {"source": "Artist", "id": "ArtistId", "text": "Name"} },
-  {"box": "box3", "query": "6", "params": "q.AlbumId=f.AlbumId", "caption": "Tracks", "type": "query"}
-]'),
-
-(6, 2, 'query', 'Track', 2, 'Track', 'TrackId', 'Track Query',
+(5, 2, 'query', 'Track', 2, 'Track', 'TrackId', 'Track Query',
 '[
   {"box": "box1", "col": "TrackId",  "params": null, "caption": "TrackId",    "type": "hidden"},
   {"box": "box2", "col": "Name",     "params": null, "caption": "Track Name", "type": "text"},
   {"box": "box2", "col": "AlbumId",  "params": null, "caption": "Album",      "type": "hidden",   "searchcriteria": "="}
+]'),
+
+(6, 2, 'form', 'Album', 2, 'Album', 'AlbumId', 'Albums Form',
+'[
+  {"box": "box1", "col": "AlbumId", "params": null, "caption": "AlbumId", "type": "hidden"},
+  {"box": "box2", "col": "Title", "params": null, "caption": "Album Title", "type": "text"},
+  {"box": "box2", "col": "ArtistId", "params": null, "caption": "Artist", "type": "select2", "options": {"source": "Artist", "id": "ArtistId", "text": "Name"} },
+  {"box": "box3", "query": "5", "params": "q.AlbumId=f.AlbumId", "caption": "Tracks", "type": "query"}
 ]');
