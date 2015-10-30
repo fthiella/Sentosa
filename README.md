@@ -17,7 +17,7 @@ Install CPAN modules:
     cpanm Log::Log4perl
     cpanm Log::Any::Adapter::Log4perl
 
-Prepare local db:
+Make sure that sqlite3 is installed then prepare local db:
 
     bin/install_db.sh
 
