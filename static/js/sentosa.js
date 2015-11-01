@@ -127,8 +127,15 @@ $(document).ready(function() {
     /* NEW FUNCTIONS */
 
     function init_table(table) {
-        var aoColumnDefs = [],
-            oTable = table.dataTable({
+        var aoColumnDefs = [];
+
+        $("tfoot input", table).each(function (n) {
+            aoColumnDefs.push(
+                {"sName": $(this).attr('name'), "bVisible": ($(this).attr('type') || 'text') === 'text', "aTargets": [ n ] }
+            );
+        });
+
+        var oTable = table.dataTable({
                 "bProcessing": true,
                 "bServerSide": true,
                 "sAjaxSource": table.attr("data-ajax-source"),
@@ -143,13 +150,6 @@ $(document).ready(function() {
                     "sSearch":       "Cerca:"
                 }
             });
-
-
-        $("tfoot input", table).each(function (n) {
-            aoColumnDefs.push(
-                {"sName": $(this).attr('name'), "bVisible": ($(this).attr('type') || 'text') === 'text', "aTargets": [ n ] }
-            );
-        });
         // console.dir(aoColumnDefs);
 
         /* SYNC: links form fields to table fields. Use a plugin like fieldsyc? */
@@ -196,7 +196,7 @@ $(document).ready(function() {
     $('select').each(function () {
         $(this).select2({
             ajax: {
-                url: "http://localhost:5000/admin/query-json/7/ArtistId",
+                url: $(this).attr('data-json'),
                 dataType: "json",
                 results: function (data) {
                     return {results: data};

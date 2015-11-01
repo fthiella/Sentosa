@@ -31,10 +31,10 @@
     </div>
 </%method>
 
-<%method input_select2 ($id, $caption, $options, $value)>
+<%method input_select2 ($id, $caption, $json, $value)>
     <label for="<% $id %>" class="control-label col-sm-2"><% $caption | H %></label>
     <div class="col-sm-10">
-      <select class="form-control" id="<% $id %>" value="<% $value %>" data-json="http://localhost:5000/admin/query-json/6/ArtistId">
+      <select class="form-control" id="<% $id %>" value="<% $value %>" data-json="<% $json %>">
       </select>
     </div>
 </%method>
@@ -120,7 +120,7 @@
     		  when ('hidden')   { print $.input_hidden($element->{col}, $element->{caption}); }
     		  when ('text')     { print $.input_text($element->{col}, $element->{caption}, ''); }
     		  when ('select')   { print $.input_select($element->{col}, $element->{caption}, $element->{options}, ''); }
-          when ('select2')  { print $.input_select2($element->{col}, $element->{caption}, undef, ''); }
+          when ('select2')  { print $.input_select2($element->{col}, $element->{caption}, '../query-json/' . $.form->{id} . '/' . $element->{col}); }
     		  when ('textarea') { print $.input_textarea($element->{col}, $element->{caption}, ''); }
           when ('checkbox') { print $.input_checkbox($element->{col}, $element->{caption}, ''); }
     		  when ('file')		{ print $.input_file($element->{col}, $element->{caption}, ''); }
