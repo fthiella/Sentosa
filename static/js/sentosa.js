@@ -130,9 +130,21 @@ $(document).ready(function() {
         var aoColumnDefs = [];
 
         $("tfoot input", table).each(function (n) {
-            aoColumnDefs.push(
-                {"sName": $(this).attr('name'), "bVisible": ($(this).attr('type') || 'text') === 'text', "aTargets": [ n ] }
-            );
+
+            var f = function (data, type, row) {
+                    if (this.attr('data-link')) {
+                        return '<a href="../' + this.attr('data-link') + '?_record='+ data+'"">' + data + '</a>';
+                    } else {
+                        return data;
+                    }
+                };
+
+            aoColumnDefs.push({
+                "sName": $(this).attr('name'),
+                "bVisible": ($(this).attr('type') || 'text') === 'text',
+                "mRender": f.bind($(this)),
+                "aTargets": [ n ]
+            });
         });
 
         var oTable = table.dataTable({

@@ -154,7 +154,7 @@ insert into af_objects values
 '[
   {"box": "box1", "col": "TrackId",  "params": null, "caption": "TrackId",    "type": "text"},
   {"box": "box2", "col": "Name",     "params": null, "caption": "Track Name", "type": "text"},
-  {"box": "box2", "col": "AlbumId",  "params": null, "caption": "Album",      "type": "text",   "searchcriteria": "="}
+  {"box": "box2", "col": "AlbumId",  "params": null, "caption": "Album",      "type": "text",   "searchcriteria": "=", "link": "form/6"}
 ]'),
 
 (6, 2, 'form', 'Album', 2, 'Album', 'AlbumId', 'Albums Form',

@@ -43,9 +43,9 @@
 %     $data_link = "";
 %   }
 %   if ( $.hide_bottom eq '0' ) {
-    <th><input type="<% $col->{type} %>" name="<% $._id %>_search_<% $col->{col} %>" value="<% $col->{col} %>" data-value="<% $col->{col} %>" <% $data_link %> class="search_init" /></th>
+    <th><input type="<% $col->{type} %>" name="<% $._id %>_search_<% $col->{col} %>" value="<% $col->{col} %>" data-value="<% $col->{col} %>" <% $data_link %> class="search_init" data-link="<% $col->{link} %>" /></th>
 %   } else {
-    <th><input type="hidden" name="<% $._id %>_search_<% $col->{col} %>" value="<% $col->{col} %>" data-value="<% $col->{col} %>" <% $data_link %> class="search_init" /></th>
+    <th><input type="hidden" name="<% $._id %>_search_<% $col->{col} %>" value="<% $col->{col} %>" data-value="<% $col->{col} %>" <% $data_link %> class="search_init" data-link="<% $col->{link} %>" /></th>
 %   }
 % }
   </tr>
