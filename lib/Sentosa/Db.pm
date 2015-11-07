@@ -2,8 +2,6 @@ package Sentosa::Db;
 
 use strict;
 use warnings;
-use feature "switch";
-no warnings 'experimental::smartmatch';
 our $VERSION = '0.10';
 
 #our $SELF = __PACKAGE__->new;
