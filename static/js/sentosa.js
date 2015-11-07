@@ -133,7 +133,7 @@ $(document).ready(function() {
 
             var f = function (data, type, row) {
                     if (this.attr('data-link')) {
-                        return '<a href="../' + this.attr('data-link') + '?_record='+ data+'"">' + data + '</a>';
+                        return '<a href="../' + this.attr('data-link') + '?_record='+ row[this.attr('data-link-id')] +'"">' + data + '</a>';
                     } else {
                         return data;
                     }

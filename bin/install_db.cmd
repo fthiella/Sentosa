@@ -21,4 +21,6 @@ rem  DEL data\chinook.db
 ECHO Importing chinook.sql ...
 rem sqlite3 -batch data\chinook.db < db\chinook.sql
 
+perl bin\samples.pl
+
 ECHO Done!

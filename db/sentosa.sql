@@ -66,7 +66,8 @@ create table if not exists af_apps (
 
 insert into af_apps (id, url, details, cover) values
 (1, 'admin', 'Sentosa Management', 'Users, groups and applications management.'),
-(2, 'chinhook', 'Chinook Sample Database', 'The Chinook Sample Database');
+(2, 'chinhook', 'Chinook Sample Database', 'The Chinook Sample Database'),
+(3, 'samples', 'Sentosa Samples', 'Sentosa Sample Database');
 
 -- af_appgroups: Applications to Groups
 create table if not exists af_appgroups (
@@ -79,7 +80,8 @@ create table if not exists af_appgroups (
 
 insert into af_appgroups (id_app, id_group) values
 (1, 1),
-(2, 2);
+(2, 2),
+(3, 2);
 
 -- af_connections: Database connections
 
@@ -92,7 +94,8 @@ create table af_connections (
 
 insert into af_connections (id, db, username, password) values
 (1, 'dbi:SQLite:dbname=data/sentosa.db', '', ''),
-(2, 'dbi:SQLite:dbname=data/chinook.db', '', '');
+(2, 'dbi:SQLite:dbname=data/chinook.db', '', ''),
+(3, 'dbi:SQLite:dbname=data/samples.sqlite', '', '');
 
 -- af_objects: object composing an application
 
@@ -154,7 +157,7 @@ insert into af_objects values
 '[
   {"box": "box1", "col": "TrackId",  "params": null, "caption": "TrackId",    "type": "text"},
   {"box": "box2", "col": "Name",     "params": null, "caption": "Track Name", "type": "text"},
-  {"box": "box2", "col": "AlbumId",  "params": null, "caption": "Album",      "type": "text",   "searchcriteria": "=", "link": "form/6"}
+  {"box": "box2", "col": "AlbumId",  "params": null, "caption": "Album",      "type": "text",   "searchcriteria": "=", "link": "form/6", "link-id": "2"}
 ]'),
 
 (6, 2, 'form', 'Album', 2, 'Album', 'AlbumId', 'Albums Form',
@@ -163,4 +166,11 @@ insert into af_objects values
   {"box": "box2", "col": "Title", "params": null, "caption": "Album Title", "type": "text"},
   {"box": "box2", "col": "ArtistId", "params": null, "caption": "Artist", "type": "select2", "options": {"source": "Artist", "id": "ArtistId", "text": "Name"} },
   {"box": "box3", "query": "5", "params": "q.AlbumId=f.AlbumId", "caption": "Tracks", "type": "query"}
+]'),
+
+(100, 3, 'query', 'Documents', 3, 'documents', 'id', 'User Documents',
+'[
+  {"box": "box1", "col": "id",   "caption": "ID", "type": "hidden"},
+  {"box": "box2", "col": "name", "caption": "Filename", "type": "text", "link": "download/100", "link-id": "0"},
+  {"box": "box2", "col": "data", "caption": "data", "type": "blob"}
 ]');

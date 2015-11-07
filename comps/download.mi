@@ -1,0 +1,54 @@
+<%flags>
+extends => undef;
+</%flags>
+
+<%class>
+  has '_id';
+  has '_name';
+</%class>
+
+<%init>
+  use Sentosa::Objects;
+  use Sentosa::Db;
+  use utf8;
+
+  my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
+  if (!$obj) { $m->not_found(); }; # form not found
+  my ($objcolumns) = Sentosa::Objects::parse_object($obj);
+
+  my $columns = [
+    { col => 'id',   search => $.args->{_record}, searchcriteria => '=' },
+    { col => 'name', search => $.args->{_name}, searchcriteria => '=' },
+    { col => 'data' }
+  ];
+
+  my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
+  my $q = Sentosa::Db::selectQuery(
+    $obj->{source},
+    $columns,
+    'ASC',
+    {},
+    0,
+    1,
+    $h->{Driver}->{Name}
+  );
+
+  my $row = $h->selectrow_hashref(
+    $q->{'query_limit'},
+    { Slice => {} },
+    @{$q->{'query_limit_data'}}
+  );
+
+  # TODO: better urls, this is not safe, and check if not exists 404
+  if (!defined $self->_name) {
+    $m->redirect("/".$m->path_info()."/".$row->{name}."?_record=".$.args->{_record});
+  } else {
+    $m->clear_buffer;
+    $m->res->content_type('application/octet-stream');
+    $m->res->header('Content-Disposition: attachment; filename='.$row->{name});
+
+    print $row->{data};
+
+    $m->abort();
+  }
+</%init>
