@@ -95,7 +95,7 @@ sub selectQuery {
 
   # get all column names from the columns array
   my @sc = map {
-    $C->{QUOTE} . $source . $C->{QUOTE}.
+    $source.
     '.'.
     $C->{QUOTE} . $_->{col} . $C->{QUOTE}
   } grep { defined $_->{col} } @{$columns};
@@ -106,15 +106,15 @@ sub selectQuery {
   # - grep gets all columns that have to be filtered
   # - map creates "field=?" or "fields LIKE ?" etc.
 
-  my @filter = map { whereFilter($C->{QUOTE}.$source.$C->{QUOTE}.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{filter} } @{$columns};
-  my @search = map { whereFilter($C->{QUOTE}.$source.$C->{QUOTE}.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{search} } @{$columns};
+  my @filter = map { whereFilter($source.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{filter} } @{$columns};
+  my @search = map { whereFilter($source.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{search} } @{$columns};
 
   my @filter_data =   (map { $_->{filter} } grep { defined $_->{filter} } @{$columns});
   my @filter_search = (map { $_->{search} } grep { defined $_->{search} } @{$columns});
 
   # TODO: pk columns should be ordered (pk asc)
-  my @order_by =      (map { $C->{QUOTE}.$source.$C->{QUOTE}.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}." ".$_->{order} } grep { defined $_->{order}  } @{$columns});
-  my @order_by_pk =   (map { $C->{QUOTE}.$source.$C->{QUOTE}.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}." $order" }       grep { defined $_->{pk}     } @{$columns});
+  my @order_by =      (map { $source.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}." ".$_->{order} } grep { defined $_->{order}  } @{$columns});
+  my @order_by_pk =   (map { $source.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}." $order" }       grep { defined $_->{pk}     } @{$columns});
 
 
   my ($pk_conditions, $pk_conditions_data) = pk_conditions(
@@ -134,7 +134,7 @@ sub selectQuery {
   $query = "SELECT\n";
   $query .= join(",\n", map { '  '.$_ } @sc) . "\n";
   $query .= "FROM\n";
-  $query .= sprintf '  '.$C->{QUOTE}.'%s'.$C->{QUOTE}."\n", $source;
+  $query .= sprintf "  %s\n", $source;
   if (defined $pk_conditions) {
     $query .= "WHERE\n  ";
     $query .= join("\n  AND ", grep defined, (@filter, $pk_conditions));
@@ -145,7 +145,7 @@ sub selectQuery {
   $query_search = "SELECT\n";
   $query_search .= join(",\n", map { '  '.$_ } @sc) . "\n";
   $query_search .= "FROM\n";
-  $query_search .= sprintf '  '.$C->{QUOTE}.'%s'.$C->{QUOTE}."\n", $source;
+  $query_search .= sprintf "  %s\n", $source;
   if ((@filter) || (defined $pk_conditions) || (@search)) {
     $query_search .= "WHERE\n";
     $query_search .= '  '.join("\n  AND ", grep defined, (@filter, $pk_conditions, @search))."\n";
@@ -159,7 +159,7 @@ sub selectQuery {
   }
   $query_limit .= join(",\n", map { '  '.$_ } @sc) . "\n";
   $query_limit .= "FROM\n";
-  $query_limit .= sprintf '  '.$C->{QUOTE}.'%s'.$C->{QUOTE}."\n", $source;
+  $query_limit .= sprintf "  %s\n", $source;
   if ((@filter) || (defined $pk_conditions) || (@search)) {
     $query_limit .= "WHERE\n";
     $query_limit .= '  '.join("\n  AND ", grep defined, (@filter, $pk_conditions, @search))."\n";
@@ -205,14 +205,14 @@ sub insertUpdateQuery {
 
   if (@pkv) {
     $query  = "UPDATE\n";
-    $query .= '  '.$C->{QUOTE}.$source.$C->{QUOTE}."\n";
+    $query .= '  '.$source."\n";
     $query .= "SET\n";
     $query .= '  '.join(",\n", map { $C->{QUOTE}.$_.$C->{QUOTE}.'=?'} @nc)."\n";
     $query .= "WHERE\n";
     $query .= '  '.join(",\n", map { $C->{QUOTE}.$_.$C->{QUOTE}.'=?'} @pkc)."\n";
   } else {
     $query  = "INSERT INTO\n";
-    $query .= '  '.$C->{QUOTE}.$source.$C->{QUOTE}." ";
+    $query .= '  '.$source." ";
     $query .= '('.join(',', map { $C->{QUOTE}.$_.$C->{QUOTE} } @nc).")\n";
     $query .= "VALUES\n";
     $query .= '  ('.join(',', (map { '?' } @nc) ).")\n";
