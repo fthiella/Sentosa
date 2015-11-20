@@ -46,8 +46,8 @@ extends => undef;
   my $query_filt     = $q->{'query_search'};
   my $query_limit    = $q->{'query_limit'};
 
-  my $query_cnt_all  = "SELECT COUNT(*) AS rows FROM ($query) q\n";
-  my $query_cnt_filt = "SELECT COUNT(*) AS rows FROM ($query_filt) q\n";
+  my $query_cnt_all  = "SELECT COUNT(*) AS nrows FROM ($query) q\n";
+  my $query_cnt_filt = "SELECT COUNT(*) AS nrows FROM ($query_filt) q\n";
 
   #### get number of unfiltered rows ####
 

@@ -37,6 +37,17 @@ my $DBMS_MAP = {
         },
         LIMIT => 'LIMIT %1$d, %2$d',
     },
+    'Oracle' => {
+        DELIMITER => ',',
+        QUOTE => '"',
+        SEARCH_MAP => {
+            '=' => '%s=?',
+            'LIKE' => '%s LIKE ? || \'%\'',
+            'SUB'  => '%s LIKE \'%\' || ? || \'%\'',
+        },
+        TOP => '* FROM (SELECT q.*, rownum rrr FROM (SELECT ',
+        LIMIT => ') q WHERE rownum <= %3$d) WHERE rrr>%1$d',
+    },
 };
 
 sub whereFilter {
@@ -49,8 +60,8 @@ sub limitFilter {
   my ($start, $length, $dbms) = @_;
 
   return (
-    (sprintf $DBMS_MAP->{$dbms}->{TOP}, $start, $length),
-    (sprintf $DBMS_MAP->{$dbms}->{LIMIT}, $start // 0, $length // 99)
+    (sprintf $DBMS_MAP->{$dbms}->{TOP}, $start, $length, $start + $length),
+    (sprintf $DBMS_MAP->{$dbms}->{LIMIT}, $start // 0, $length // 99, ($start // 0) + ($length // 99))
   );
 }
 
