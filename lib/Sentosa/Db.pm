@@ -146,9 +146,9 @@ sub selectQuery {
   $query .= join(",\n", map { '  '.$_ } @sc) . "\n";
   $query .= "FROM\n";
   $query .= sprintf "  %s\n", $source;
-  if (defined $pk_conditions) {
+  if ((defined $pk_conditions) || (@filter)) {
     $query .= "WHERE\n  ";
-    $query .= join("\n  AND ", grep defined, (@filter, $pk_conditions));
+    $query .= join("\n  AND ", grep defined, (@filter, $pk_conditions))."\n";
   }
 
   # query_search
