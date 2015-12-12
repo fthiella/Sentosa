@@ -2,6 +2,8 @@
 
 Sentosa AutoForms aims to provide a web interface for databases, with forms, subforms, tables and reports, etc.
 
+![Sentosa Demo](https://raw.githubusercontent.com/fthiella/Sentosa/518976bc23023f955fc537ad48dfd325e01af40f/Sentosa.gif)
+
 ## Getting Started
 
 August 2015: It's still very early in development. Please come back soon, I have some code but not much to show now. Some basic interface will be ready around half of September 2015.
