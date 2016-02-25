@@ -1,25 +1,22 @@
--- --------------------------------------------------------
--- Internal tables
--- --------------------------------------------------------
+/*
+  username=""
+  password=""
+*/
 
-PRAGMA encoding = "UTF-8";
+/* SENTOSA Application info, version, installation name, etc. */
 
--- af_info: application info, version, etc.
 create table if not exists af_info (
   id integer primary key autoincrement,
-  attribute string not null,
+  attribute string not null unique,
   value string not null
 );
 
-insert into af_info (attribute, value) values
+insert or replace into af_info (attribute, value) values
 ('name', 'Sentosa Autoforms'),
-('version', '0.10');
- 
--- --------------------------------------------------------
--- Configuration Tables
--- --------------------------------------------------------
+('version', '0.20a');
 
--- af_users: usernames and passwords
+/* SENTOSA Default users*/
+
 create table if not exists af_users (
   id integer primary key autoincrement,
   username varchar(200) NOT NULL UNIQUE,
@@ -27,21 +24,23 @@ create table if not exists af_users (
   password varchar(200) NOT NULL
 );
 
-insert into af_users (id, username, userdesc, password) values
-(1, 'admin', 'Sentosa Administrator', 'password'),
-(2, 'user',  'Standard User',         'password');
+insert or replace into af_users (id, username, userdesc, password) values
+(1, 'admin', 'Administrator', 'password'),
+(2, 'user',  'User',          'password');
 
--- af_groups: groups
+/* SENTOSA Default groups */
+
 create table if not exists af_groups (
   id integer primary key autoincrement,
   groupname string NOT NULL
 );
 
-insert into af_groups (id, groupname) values
+insert or replace into af_groups (id, groupname) values
 (1, 'administrators'),
 (2, 'samples');
 
--- af_usergroups: Users to Groups
+/* SENTOSA Users to groups */
+
 create table if not exists af_usergroups (
   id integer primary key autoincrement,
   id_user integer,
@@ -50,26 +49,27 @@ create table if not exists af_usergroups (
   FOREIGN KEY(id_group) REFERENCES af_groups(id)
 );
 
-insert into af_usergroups (id_user, id_group) values
-(1, 1),
-(2, 2);
+insert or replace into af_usergroups (id_user, id_group) values
+((select id from af_users where username='admin'), (select id from af_groups where groupname='administrators')),
+((select id from af_users where username='user'),  (select id from af_groups where groupname='samples'));
 
--- af_apps: published applications
+/* SENTOSA Standard Apps */
 
 create table if not exists af_apps (
   id integer primary key autoincrement,
-  url string,
+  url string unique,
   details string,
   cover string,
   image string
 );
 
-insert into af_apps (id, url, details, cover) values
-(1, 'admin', 'Sentosa Management', 'Users, groups and applications management.'),
-(2, 'chinhook', 'Chinook Sample Database', 'The Chinook Sample Database'),
-(3, 'samples', 'Sentosa Samples', 'Sentosa Sample Database');
+insert or replace into af_apps (url, details, cover) values
+('admin', 'Sentosa Management', 'Users, groups and applications management.'),
+('chinhook', 'Chinook Sample Database', 'The Chinook Sample Database'),
+('samples', 'Sentosa Samples', 'Sentosa Sample Database');
 
--- af_appgroups: Applications to Groups
+/* SENTOSA Standard Apps to Groups */
+
 create table if not exists af_appgroups (
   id integer primary key autoincrement,
   id_app integer,
@@ -78,28 +78,30 @@ create table if not exists af_appgroups (
   foreign key(id_group) references af_groups(id)
 );
 
-insert into af_appgroups (id_app, id_group) values
-(1, 1),
-(2, 2),
-(3, 2);
+insert or replace into af_appgroups (id_app, id_group) values
+((select id from af_apps where url='admin'),    (select id from af_groups where groupname='administrators')),
+((select id from af_apps where url='chinhook'), (select id from af_groups where groupname='samples')),
+((select id from af_apps where url='samples'),  (select id from af_groups where groupname='samples'));
 
--- af_connections: Database connections
+/* SENTOSA Standard connections */
 
-create table af_connections (
+create table if not exists af_connections (
   id integer primary key autoincrement,
+  name unique,
   db string,
   username string,
   password string
 );
 
-insert into af_connections (id, db, username, password) values
-(1, 'dbi:SQLite:dbname=data/sentosa.db', '', ''),
-(2, 'dbi:SQLite:dbname=data/chinook.db', '', ''),
-(3, 'dbi:SQLite:dbname=data/samples.sqlite', '', '');
+insert or replace into af_connections (id, name, db, username, password) values
+(1, 'sentosa', 'dbi:SQLite:dbname=data/sentosa.db', '', ''),
+(2, 'chinhook', 'dbi:SQLite:dbname=data/chinook.db', '', ''),
+(3, 'samples', 'dbi:SQLite:dbname=data/samples.sqlite', '', '');
 
--- af_objects: object composing an application
 
-create table af_objects (
+/* SENTOSA Standard objects */
+
+create table if not exists af_objects (
   id integer primary key autoincrement,
   id_app integer,
   type varchar(45),
@@ -110,10 +112,11 @@ create table af_objects (
   description varchar(45),
   def text,
   FOREIGN KEY(id_app) REFERENCES af_apps(id),
-  FOREIGN KEY(id_connection) REFERENCES af_connections(id)
+  FOREIGN KEY(id_connection) REFERENCES af_connections(id),
+  unique (id_app, name)
 );
 
-insert into af_objects values
+insert or replace into af_objects values
 -- management
 (1, 1, 'form', 'Users', 1, 'af_users', 'id', 'Users Form',
 '[
