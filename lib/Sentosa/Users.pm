@@ -24,6 +24,20 @@ sub get_userinfo {
  return $ar;
 }
 
+sub get_userproperty {
+  my ($id, $property) = @_;
+  
+  my $ar = $dbh->selectrow_hashref(
+    "SELECT value
+    FROM af_userproperties
+    WHERE id_user=? and property=?",
+    {Slice => {}},
+    $id, $property
+  );
+
+ return $ar->{value};
+}
+
 sub get_groupsuserinfo {
   my ($id) = @_;
   

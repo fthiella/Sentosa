@@ -19,6 +19,14 @@ extends => undef;
   if (!$obj) { $m->not_found(); }; # form not found
   my ($columns) = Sentosa::Objects::parse_object($obj);
 
+  # Add filter from properties
+
+  foreach my $l (@{$columns}) {
+    if ($l->{filter} =~ /^\{(.*)\}$/) {
+      $l->{filter}=Sentosa::Users::get_userproperty($m->session->{auth_id}, $1);
+    };
+  }
+
   # add sSearch_nn to the columns data structure
 
   foreach (grep {/^sSearch_\d+/} keys $.args) {

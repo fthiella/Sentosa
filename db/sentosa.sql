@@ -1,4 +1,5 @@
 /*
+  conn="dbi:SQLite:dbname=data/sentosa.db"
   username=""
   password=""
 */
@@ -27,6 +28,20 @@ create table if not exists af_users (
 insert or replace into af_users (id, username, userdesc, password) values
 (1, 'admin', 'Administrator', 'password'),
 (2, 'user',  'User',          'password');
+
+/* SENTOSA Default properties for users */
+
+create table if not exists af_userproperties (
+	id integer primary key autoincrement,
+	id_user integer,
+	property varchar(200) NOT NULL,
+	value varchar(200) NOT NULL,
+	FOREIGN KEY(id_user) REFERENCES af_users(id)
+);
+
+insert or replace into af_userproperties (id_user, property, value) values
+(1, 'code', 'admin'),
+(2, 'code', 'user');
 
 /* SENTOSA Default groups */
 
@@ -134,7 +149,7 @@ insert or replace into af_objects values
 (3, 1, 'query', 'Users', 1, 'af_users', 'id', 'Users List',
 '[
   {"col": "id", "caption": "id"},
-  {"col": "username", "caption": "Username"},
+  {"col": "username", "caption": "Username", "filter": "{code}"},
   {"col": "password", "caption": "Password"}
 ]'),
 
