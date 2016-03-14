@@ -75,9 +75,11 @@ extends => undef;
   );
 
   # $m->send_json( \%src );
-  $m->clear_buffer;
+  #$m->clear_buffer;
   # $m->print(JSON::XS::encode_json(\%j));
-  $m->print(JSON::XS->new->encode(\%src));
-  $m->res->content_type("application/json");
-  $m->abort();
+  #$m->print(JSON::XS->new->encode(\%src));
+  #$m->res->content_type("application/json");
+  #$m->abort();
+
+  $m->send_json( \%src );
 </%perl>

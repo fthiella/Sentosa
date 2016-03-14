@@ -60,9 +60,12 @@ extends => undef;
 # $m->send_json( \%j );
 # this answer helped me http://stackoverflow.com/a/31170871/833073
 
-  $m->clear_buffer;
+#  $m->clear_buffer;
   # $m->print(JSON::XS::encode_json(\%j));
-  $m->print(JSON::XS->new->encode(\%j));
-  $m->res->content_type("application/json");
-  $m->abort();
+#  $m->print(JSON::XS->new->encode(\%j));
+#  $m->res->content_type("application/json");
+#  $m->abort();
+
+# TODO: added Mason::Plugin::WithEncoding, test if it encodes utf-8 correctly now
+  $m->send_json( \%j );
 </%perl>
