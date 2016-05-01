@@ -12,8 +12,6 @@ extends => undef
   use feature qw( switch );
   use Poet qw($log);
   use JSON ();
-  use Sentosa::Objects;
-  use Sentosa::Db;
   
   my ($obj) = Sentosa::Objects::get_object($._id, 'form', $m->session->{auth_id});
   if (!$obj) { $m->not_found(); }; # form not found
@@ -28,7 +26,7 @@ extends => undef
   }
 
   if ($.button eq 'save') {
-    my $q = Sentosa::Db::insertUpdateQuery(
+    my $q = Sentosa::SQL::insertUpdateQuery(
       $obj->{source},
       $columns,
       $db->{Driver}->{Name}
@@ -73,7 +71,7 @@ extends => undef
     }
 
     my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
-    my $q = Sentosa::Db::selectQuery(
+    my $q = Sentosa::SQL::selectQuery(
       $obj->{source},
       $columns,
       $order,

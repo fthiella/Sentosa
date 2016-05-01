@@ -29,9 +29,7 @@
                 </div>
             </div>
         </div>
-<%init>
-  use Sentosa::Utils;
-  
+<%init>  
   # logout
   delete $m->session->{auth_id};
 

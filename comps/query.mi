@@ -7,7 +7,6 @@
 </%class>
 <%init>
   use JSON ();
-  use Sentosa::Objects;
 
   my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
   if (!$obj) { $m->not_found(); }; # form not found

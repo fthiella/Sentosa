@@ -1,7 +1,9 @@
-package Sentosa::Db;
+package Sentosa::SQL;
 
 use strict;
 use warnings;
+use utf8;
+
 our $VERSION = '0.10';
 
 #our $SELF = __PACKAGE__->new;
@@ -11,9 +13,10 @@ my $DBMS_MAP = {
         DELIMITER  => ',',
         QUOTE      => '"',
         SEARCH_MAP => {
-            '='    => '%s=?',
-            'LIKE' => '%s LIKE ? || \'%\'',
-            'SUB'  => '%s LIKE \'%\' || ? || \'%\'',
+            '='     => '%s=?',
+            'LIKE'  => '%s LIKE ? || \'%%\'',
+            'ILIKE' => '%s LIKE ? || \'%%\'',
+            'SUB'   => '%s LIKE \'%%\' || ? || \'%%\'',
         },
         LIMIT => 'LIMIT %1$d, %2$d',
     },
@@ -21,9 +24,10 @@ my $DBMS_MAP = {
         DELIMITER  => ',',
         QUOTE      => '"',
         SEARCH_MAP => {
-            '='    => '%s=?',
-            'LIKE' => '%s LIKE ? || \'%\'',
-            'SUB'  => '%s LIKE \'%\' || ? || \'%\'',
+            '='     => '%s=?',
+            'LIKE'  => '%s LIKE ? || \'%%\'',
+            'ILIKE' => '%s ILIKE ? || \'%%\'',
+            'SUB'   => '%s LIKE \'%%\' || ? || \'%%\'',
         },
         LIMIT => 'LIMIT %2$d OFFSET %1$d',
     },
@@ -31,9 +35,10 @@ my $DBMS_MAP = {
         DELIMITER    => ',',
         QUOTE      => '`',
         SEARCH_MAP => {
-            '='    => '%s=?',
-            'LIKE' => '%s LIKE CONCAT(?,\'%\')',
-            'SUB'  => '%s LIKE CONCAT(?,\'%\')',
+            '='     => '%s=?',
+            'LIKE'  => '%s LIKE CONCAT(?,\'%%\')',
+            'ILIKE' => '%s LIKE CONCAT(?,\'%%\')',
+            'SUB'   => '%s LIKE CONCAT(?,\'%%\')',
         },
         LIMIT => 'LIMIT %1$d, %2$d',
     },
@@ -41,9 +46,10 @@ my $DBMS_MAP = {
         DELIMITER => ',',
         QUOTE => '"',
         SEARCH_MAP => {
-            '=' => '%s=?',
-            'LIKE' => '%s LIKE ? || \'%\'',
-            'SUB'  => '%s LIKE \'%\' || ? || \'%\'',
+            '='     => '%s=?',
+            'LIKE'  => '%s LIKE ? || \'%%\'',
+            'ILIKE' => 'regexp_like(%s, \'^\' || ?, \'i\')',
+            'SUB'   => '%s LIKE \'%%\' || ? || \'%%\'',
         },
         TOP => '* FROM (SELECT q.*, rownum rrr FROM (SELECT ',
         LIMIT => ') q WHERE rownum <= %3$d) WHERE rrr>%1$d',
@@ -60,8 +66,8 @@ sub limitFilter {
   my ($start, $length, $dbms) = @_;
 
   return (
-    (sprintf $DBMS_MAP->{$dbms}->{TOP}, $start, $length, $start + $length),
-    (sprintf $DBMS_MAP->{$dbms}->{LIMIT}, $start // 0, $length // 99, ($start // 0) + ($length // 99))
+    (sprintf $DBMS_MAP->{$dbms}->{TOP} // '', $start, $length, $start + $length),
+    (sprintf $DBMS_MAP->{$dbms}->{LIMIT} // '', $start // 0, $length // 99, ($start // 0) + ($length // 99))
   );
 }
 
@@ -106,10 +112,10 @@ sub selectQuery {
 
   # get all column names from the columns array
   my @sc = map {
-    $source.
-    '.'.
     $C->{QUOTE} . $_->{col} . $C->{QUOTE}
-  } grep { defined $_->{col} } @{$columns};
+  } grep {
+  	defined $_->{col}
+  } @{$columns};
 
   # Filter: filter table (for example by username)
   # Search: search within filtered table
@@ -117,15 +123,15 @@ sub selectQuery {
   # - grep gets all columns that have to be filtered
   # - map creates "field=?" or "fields LIKE ?" etc.
 
-  my @filter = map { whereFilter($source.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{filter} } @{$columns};
-  my @search = map { whereFilter($source.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{search} } @{$columns};
+  my @filter = map { whereFilter($C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{filter} } @{$columns};
+  my @search = map { whereFilter($C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{search} } @{$columns};
 
   my @filter_data =   (map { $_->{filter} } grep { defined $_->{filter} } @{$columns});
   my @filter_search = (map { $_->{search} } grep { defined $_->{search} } @{$columns});
 
   # TODO: pk columns should be ordered (pk asc)
-  my @order_by =      (map { $source.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}." ".$_->{order} } grep { defined $_->{order}  } @{$columns});
-  my @order_by_pk =   (map { $source.'.'.$C->{QUOTE}.$_->{col}.$C->{QUOTE}." $order" }       grep { defined $_->{pk}     } @{$columns});
+  my @order_by =      (map { $C->{QUOTE}.$_->{col}.$C->{QUOTE}." ".$_->{order} } grep { defined $_->{order}  } @{$columns});
+  my @order_by_pk =   (map { $C->{QUOTE}.$_->{col}.$C->{QUOTE}." $order" }       grep { defined $_->{pk}     } @{$columns});
 
 
   my ($pk_conditions, $pk_conditions_data) = pk_conditions(
@@ -177,7 +183,7 @@ sub selectQuery {
   }
   if ((@order_by) || (@order_by_pk)) {
     $query_limit .= "ORDER BY\n";
-    $query_limit .= '  '.join("\n,  ", @order_by, @order_by_pk)."\n";
+    $query_limit .= '  '.join(",\n  ", @order_by, @order_by_pk)."\n";
   }
   if ($limit2) {
     $query_limit .= "$limit2\n";

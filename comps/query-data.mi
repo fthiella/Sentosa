@@ -12,8 +12,6 @@ extends => undef;
 </%class>
 <%init>
   # TODO: it is fun to code this component, but it's still not rock solid, maybe DBIx::Class could help much more? http://www.dbix-class.org/
-  use Sentosa::Objects;
-  use Sentosa::Db;
 
   my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
   if (!$obj) { $m->not_found(); }; # form not found
@@ -38,7 +36,7 @@ extends => undef;
   }
 
   my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
-  my $q = Sentosa::Db::selectQuery(
+  my $q = Sentosa::SQL::selectQuery(
     $obj->{source},
     $columns,
     'ASC',

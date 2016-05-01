@@ -1,5 +1,4 @@
 <%init>
-  use Sentosa::Utils;
   use Data::Dumper;
 
   $._title(Sentosa::Utils::get_sentosainfo);

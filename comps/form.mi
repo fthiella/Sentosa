@@ -27,7 +27,6 @@ Example:
 </%class>
 <%init>
   use JSON ();
-  use Sentosa::Objects;
 
   my ($form) = Sentosa::Objects::get_object($._id, 'form', $m->session->{auth_id});
   if (!$form) { $m->not_found(); }; # form not found
