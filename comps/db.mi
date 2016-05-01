@@ -18,6 +18,8 @@ extends => undef
   my ($columns) = Sentosa::Objects::parse_object($obj);
 
   my $db = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
+  $db->{sqlite_unicode} = 1;
+  $db->{mysql_enable_utf8} = 1;
 
   my @pk_values = map { $.args->{$_->{col}} } grep { defined $_->{pk} } @{$columns};
 
@@ -71,6 +73,8 @@ extends => undef
     }
 
     my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
+    $h->{sqlite_unicode} = 1;
+    $h->{mysql_enable_utf8} = 1;
     my $q = Sentosa::SQL::selectQuery(
       $obj->{source},
       $columns,

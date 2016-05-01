@@ -19,6 +19,9 @@ extends => undef;
   ];
 
   my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
+  $h->{sqlite_unicode} = 1;
+  $h->{mysql_enable_utf8} = 1;
+
   my $q = Sentosa::SQL::selectQuery(
     $obj->{source},
     $columns,
