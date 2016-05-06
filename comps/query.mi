@@ -8,10 +8,17 @@
 <%init>
   use JSON ();
 
-  my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
-  if (!$obj) { $m->not_found(); }; # form not found
+  #my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
+  #if (!$obj) { $m->not_found(); }; # form not found
   
-  my $columns = JSON->new->utf8->decode($obj->{def});
+  #my $columns = JSON->new->utf8->decode($obj->{def});
+
+  my ($obj, $columns) = Sentosa::Objects::get_recordSource({
+    id => $._id,
+    type => 'query',
+    userid => $m->session->{auth_id}
+  });
+  if (!$obj) { $m->not_found(); }; # form not found
 
   # TODO: always quote all identifiers, on every component not just here ^_^
   my @fields = map { $_->{col} } @{$columns};

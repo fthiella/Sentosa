@@ -7,8 +7,7 @@ use Poet qw($dbh);
 use JSON ();
 
 sub get_object {
-  # TODO: I decided to ignore type, since a query can became a form, and a form can became a query.
-  # TODO: I just want to be sure that it's actually a good idea
+  # TODO: I decided to ignore type, since a query can became a form, and a form can became a query, but I'm still undecided if this is a good idea or not :)
   my ($id, $objecttype, $userid) = @_;
 
   my $ar = $dbh->selectall_arrayref(
@@ -33,6 +32,41 @@ sub get_object {
     ",
     {Slice => {}},
     $id,
+    $userid,
+    $userid
+  );
+  # TODO: administrators have to see everything!
+
+ return @{ $ar };
+}
+
+sub get_object_by_name {
+  # TODO: I decided to ignore type, since a query can became a form, and a form can became a query, but I'm still undecided if this is a good idea or not :)
+  my ($idapp, $name, $objecttype, $userid) = @_;
+
+  my $ar = $dbh->selectall_arrayref(
+    "SELECT o.id, o.name, o.source, o.description, o.def, o.pk, c.db, c.username, c.password
+    FROM
+      af_objects o INNER JOIN a ON o.id_app=a.id
+      INNER JOIN af_connections c ON o.id_connection = c.id
+    WHERE
+      a.name=? and o.name=?
+      AND
+        o.id_app IN (
+          SELECT a.id
+          FROM
+            af_apps a LEFT JOIN af_appgroups ag
+            ON a.id = ag.id_app
+            LEFT JOIN af_usergroups u
+            ON ag.id_group = u.id_group
+          WHERE
+            u.id_user=?
+            OR '1'=?
+        )
+    ",
+    {Slice => {}},
+    $idapp,
+    $name,
     $userid,
     $userid
   );
@@ -95,6 +129,29 @@ sub parse_object {
   }
 
   return $columns;
+}
+
+sub get_recordSource {
+  my ($args) = @_;
+
+  #my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
+  #if (!$obj) { $m->not_found(); }; # form not found
+  #my ($columns) = Sentosa::Objects::parse_object($obj);
+
+  my ($obj) = Sentosa::Objects::get_object($args->{id}, $args->{type}, $args->{userid});
+  if (!$obj) { return; }
+
+  my ($columns) = Sentosa::Objects::parse_object($obj);
+
+  # Add filter from properties
+
+  foreach my $l (@{$columns}) {
+    if ($l->{filter} =~ /^\{(.*)\}$/) {
+      $l->{filter}=Sentosa::Users::get_userproperty($args->{userid}, $1);
+    };
+  }
+
+  return ($obj, $columns);
 }
 
 1;

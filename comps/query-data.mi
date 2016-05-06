@@ -13,17 +13,12 @@ extends => undef;
 <%init>
   # TODO: it is fun to code this component, but it's still not rock solid, maybe DBIx::Class could help much more? http://www.dbix-class.org/
 
-  my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
+  my ($obj, $columns) = Sentosa::Objects::get_recordSource({
+      id => $._id,
+      type => 'query',
+      userid => $m->session->{auth_id}
+    });
   if (!$obj) { $m->not_found(); }; # form not found
-  my ($columns) = Sentosa::Objects::parse_object($obj);
-
-  # Add filter from properties
-
-  foreach my $l (@{$columns}) {
-    if ($l->{filter} =~ /^\{(.*)\}$/) {
-      $l->{filter}=Sentosa::Users::get_userproperty($m->session->{auth_id}, $1);
-    };
-  }
 
   # add sSearch_nn to the columns data structure
 

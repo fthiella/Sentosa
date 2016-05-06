@@ -12,10 +12,13 @@ extends => undef
   use feature qw( switch );
   use Poet qw($log);
   use JSON ();
-  
-  my ($obj) = Sentosa::Objects::get_object($._id, 'form', $m->session->{auth_id});
+
+  my ($obj, $columns) = Sentosa::Objects::get_recordSource({
+    id => $._id,
+    type => 'form',
+    userid => $m->session->{auth_id}
+  });
   if (!$obj) { $m->not_found(); }; # form not found
-  my ($columns) = Sentosa::Objects::parse_object($obj);
 
   my $db = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
   $db->{sqlite_unicode} = 1;

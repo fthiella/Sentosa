@@ -28,10 +28,12 @@ Example:
 <%init>
   use JSON ();
 
-  my ($form) = Sentosa::Objects::get_object($._id, 'form', $m->session->{auth_id});
+  my ($form, $columns) = Sentosa::Objects::get_recordSource({
+    id => $._id,
+    type => 'query',
+    userid => $m->session->{auth_id}
+  });
   if (!$form) { $m->not_found(); }; # form not found
-  
-  my @boxes = JSON->new->utf8->decode($form->{def});
 </%init>
 <&
   form-widget.mi,
@@ -39,7 +41,7 @@ Example:
       id => $form->{id},
       description => $form->{description},
       record => $._record,
-	  pk => $form->{pk},
-      boxes => @boxes
+	    pk => $form->{pk},
+      boxes => $columns
     }
 &>
