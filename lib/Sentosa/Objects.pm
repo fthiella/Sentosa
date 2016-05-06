@@ -88,8 +88,9 @@ sub parse_object {
   }
 
   # adds pk info to the columns data structure
-  my $i=0;
+  $i=0;
   foreach my $k (split ',', $obj->{pk}) {
+    # TODO: deprecated
     ${$columns}[ %columns_lookup->{$k} ]{'pk'} = $i++;
   }
 

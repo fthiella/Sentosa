@@ -106,16 +106,17 @@ sub pk_conditions {
 }
 
 sub selectQuery {
-  my ($source, $columns, $order, $goto, $start, $length, $dbms) = @_;
+  #my ($source, $columns, $order, $goto, $start, $length, $dbms) = @_;
+  my ($args) = @_;
 
-  my $C = $DBMS_MAP->{$dbms};
+  my $C = $DBMS_MAP->{$args->{dbms}};
 
   # get all column names from the columns array
   my @sc = map {
     $C->{QUOTE} . $_->{col} . $C->{QUOTE}
   } grep {
   	defined $_->{col}
-  } @{$columns};
+  } @{$args->{columns}};
 
   # Filter: filter table (for example by username)
   # Search: search within filtered table
@@ -123,24 +124,24 @@ sub selectQuery {
   # - grep gets all columns that have to be filtered
   # - map creates "field=?" or "fields LIKE ?" etc.
 
-  my @filter = map { whereFilter($C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{filter} } @{$columns};
-  my @search = map { whereFilter($C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $dbms) } grep { defined $_->{search} } @{$columns};
+  my @filter = map { whereFilter($C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $args->{dbms}) } grep { defined $_->{filter} } @{$args->{columns}};
+  my @search = map { whereFilter($C->{QUOTE}.$_->{col}.$C->{QUOTE}, $_->{searchcriteria}, $args->{dbms}) } grep { defined $_->{search} } @{$args->{columns}};
 
-  my @filter_data =   (map { $_->{filter} } grep { defined $_->{filter} } @{$columns});
-  my @filter_search = (map { $_->{search} } grep { defined $_->{search} } @{$columns});
+  my @filter_data =   (map { $_->{filter} } grep { defined $_->{filter} } @{$args->{columns}});
+  my @filter_search = (map { $_->{search} } grep { defined $_->{search} } @{$args->{columns}});
 
   # TODO: pk columns should be ordered (pk asc)
-  my @order_by =      (map { $C->{QUOTE}.$_->{col}.$C->{QUOTE}." ".$_->{order} } grep { defined $_->{order}  } @{$columns});
-  my @order_by_pk =   (map { $C->{QUOTE}.$_->{col}.$C->{QUOTE}." $order" }       grep { defined $_->{pk}     } @{$columns});
+  my @order_by =      (map { $C->{QUOTE}.$_->{col}.$C->{QUOTE}." ".$_->{order} } grep { defined $_->{order}  } @{$args->{columns}});
+  my @order_by_pk =   (map { $C->{QUOTE}.$_->{col}.$C->{QUOTE}." $args->{order}" }       grep { defined $_->{pk}     } @{$args->{columns}});
 
 
   my ($pk_conditions, $pk_conditions_data) = pk_conditions(
-    [map { $_->{col} } grep { defined $_->{pk} } @{$columns}],
-    $goto->{pk},
-    $goto->{move}
+    [map { $_->{col} } grep { defined $_->{pk} } @{$args->{columns}}],
+    $args->{goto}->{pk},
+    $args->{goto}->{move}
   );
 
-  my ($limit1, $limit2) = limitFilter($start, $length, $dbms);
+  my ($limit1, $limit2) = limitFilter($args->{start}, $args->{length}, $args->{dbms});
 
   my $query;
   my $query_search;
@@ -151,7 +152,7 @@ sub selectQuery {
   $query = "SELECT\n";
   $query .= join(",\n", map { '  '.$_ } @sc) . "\n";
   $query .= "FROM\n";
-  $query .= sprintf "  %s\n", $source;
+  $query .= sprintf "  %s\n", $args->{source};
   if ((defined $pk_conditions) || (@filter)) {
     $query .= "WHERE\n  ";
     $query .= join("\n  AND ", grep defined, (@filter, $pk_conditions))."\n";
@@ -162,7 +163,7 @@ sub selectQuery {
   $query_search = "SELECT\n";
   $query_search .= join(",\n", map { '  '.$_ } @sc) . "\n";
   $query_search .= "FROM\n";
-  $query_search .= sprintf "  %s\n", $source;
+  $query_search .= sprintf "  %s\n", $args->{source};
   if ((@filter) || (defined $pk_conditions) || (@search)) {
     $query_search .= "WHERE\n";
     $query_search .= '  '.join("\n  AND ", grep defined, (@filter, $pk_conditions, @search))."\n";
@@ -176,7 +177,7 @@ sub selectQuery {
   }
   $query_limit .= join(",\n", map { '  '.$_ } @sc) . "\n";
   $query_limit .= "FROM\n";
-  $query_limit .= sprintf "  %s\n", $source;
+  $query_limit .= sprintf "  %s\n", $args->{source};
   if ((@filter) || (defined $pk_conditions) || (@search)) {
     $query_limit .= "WHERE\n";
     $query_limit .= '  '.join("\n  AND ", grep defined, (@filter, $pk_conditions, @search))."\n";
@@ -205,31 +206,32 @@ sub insertUpdateQuery {
   # TODO: how to distinguish between empty and NULL?
   # TODO: what if a primary key is not auto_increment (or is multiple fields?)
   #       need to distinguish between insert and update, but client side
-  my ($source, $columns, $dbms) = @_;
+  #my ($source, $columns, $dbms) = @_;
+  my ($args) = @_;
 
-  my $C = $DBMS_MAP->{$dbms};
+  my $C = $DBMS_MAP->{$args->{dbms}};
 
   # get new columns, and new values
-  my @nc = map { $_->{col} } grep { (defined $_->{new}) && (!defined $_->{pk})} @{$columns};
-  my @nv = map { $_->{new} } grep { (defined $_->{new}) && (!defined $_->{pk})} @{$columns};
+  my @nc = map { $_->{col} } grep { (defined $_->{new}) && (!defined $_->{pk})} @{$args->{columns}};
+  my @nv = map { $_->{new} } grep { (defined $_->{new}) && (!defined $_->{pk})} @{$args->{columns}};
 
   # get pk columns and pk values (if given)
 
-  my @pkc = map { $_->{col} } grep { (defined $_->{new}) && (defined $_->{pk})} @{$columns};
-  my @pkv = map { $_->{new} } grep { (defined $_->{new}) && (defined $_->{pk})} @{$columns};
+  my @pkc = map { $_->{col} } grep { (defined $_->{new}) && (defined $_->{pk})} @{$args->{columns}};
+  my @pkv = map { $_->{new} } grep { (defined $_->{new}) && (defined $_->{pk})} @{$args->{columns}};
 
   my $query;
 
   if (@pkv) {
     $query  = "UPDATE\n";
-    $query .= '  '.$source."\n";
+    $query .= '  '.$args->{source}."\n";
     $query .= "SET\n";
     $query .= '  '.join(",\n", map { $C->{QUOTE}.$_.$C->{QUOTE}.'=?'} @nc)."\n";
     $query .= "WHERE\n";
     $query .= '  '.join(",\n", map { $C->{QUOTE}.$_.$C->{QUOTE}.'=?'} @pkc)."\n";
   } else {
     $query  = "INSERT INTO\n";
-    $query .= '  '.$source." ";
+    $query .= '  '.$args->{source}." ";
     $query .= '('.join(',', map { $C->{QUOTE}.$_.$C->{QUOTE} } @nc).")\n";
     $query .= "VALUES\n";
     $query .= '  ('.join(',', (map { '?' } @nc) ).")\n";

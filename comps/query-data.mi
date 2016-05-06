@@ -39,15 +39,15 @@ extends => undef;
   $h->{sqlite_unicode} = 1;
   $h->{mysql_enable_utf8} = 1;
 
-  my $q = Sentosa::SQL::selectQuery(
-    $obj->{source},
-    $columns,
-    'ASC',
-    {},
-    $.iDisplayStart,
-    $.iDisplayLength,
-    $h->{Driver}->{Name}
-  );
+  my $q = Sentosa::SQL::selectQuery({
+    source => $obj->{source},
+    columns => $columns,
+    order => 'ASC',
+    goto => {},
+    start => $.iDisplayStart,
+    length => $.iDisplayLength,
+    dbms => $h->{Driver}->{Name}
+  });
 
 #  #################################################################
   

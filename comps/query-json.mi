@@ -23,15 +23,15 @@ extends => undef;
   $h->{sqlite_unicode} = 1;
   $h->{mysql_enable_utf8} = 1;
 
-  my $q = Sentosa::SQL::selectQuery(
-    $opt->{source},
-    $columns,
-    'ASC',
-    {},
-    undef,
-    undef,
-    $h->{Driver}->{Name}
-  );
+  my $q = Sentosa::SQL::selectQuery({
+    source => $opt->{source},
+    columns => $columns,
+    order => 'ASC',
+    goto => {},
+    start => undef,
+    length => undef,
+    dbms => $h->{Driver}->{Name}
+  });
   my $query_limit    = $q->{'query_limit'};
 </%init>
 <%perl>

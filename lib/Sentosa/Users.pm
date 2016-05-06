@@ -108,7 +108,7 @@ sub auth_user {
     $p
   );
  
-  if ($ar->[0]->{username} eq $u) {
+  if (($ar->[0]->{username}) && ($ar->[0]->{username} eq $u)) {
    return $ar->[0]->{id};
   }
 

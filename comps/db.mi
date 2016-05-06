@@ -28,11 +28,11 @@ extends => undef
   }
 
   if ($.button eq 'save') {
-    my $q = Sentosa::SQL::insertUpdateQuery(
-      $obj->{source},
-      $columns,
-      $db->{Driver}->{Name}
-    );
+    my $q = Sentosa::SQL::insertUpdateQuery({
+      source => $obj->{source},
+      columns => $columns,
+      dbms => $db->{Driver}->{Name}
+    });
 
     my $sth = $db->prepare($q->{'query'});
     my %j;
@@ -75,15 +75,15 @@ extends => undef
     my $h = DBI->connect($obj->{db}, $obj->{username}, $obj->{password}) or die("connection to ".$obj->{db}." error.\n");
     $h->{sqlite_unicode} = 1;
     $h->{mysql_enable_utf8} = 1;
-    my $q = Sentosa::SQL::selectQuery(
-      $obj->{source},
-      $columns,
-      $order,
-      $move,
-      undef,
-      1,
-      $h->{Driver}->{Name}
-    );
+    my $q = Sentosa::SQL::selectQuery({
+      source => $obj->{source},
+      columns => $columns,
+      order => $order,
+      goto => $move,
+      start => undef,
+      length => 1,
+      dbms => $h->{Driver}->{Name}
+    });
 
     my $j = $db->selectrow_hashref($q->{'query_limit'}, undef, @{$q->{'query_limit_data'}});
 
