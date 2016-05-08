@@ -47,10 +47,10 @@ sub get_object_by_name {
   my $ar = $dbh->selectall_arrayref(
     "SELECT o.id, o.name, o.source, o.description, o.def, o.pk, c.db, c.username, c.password
     FROM
-      af_objects o INNER JOIN a ON o.id_app=a.id
+      af_objects o INNER JOIN af_apps a ON o.id_app=a.id
       INNER JOIN af_connections c ON o.id_connection = c.id
     WHERE
-      a.name=? and o.name=?
+      a.url=? and o.name=?
       AND
         o.id_app IN (
           SELECT a.id
@@ -138,7 +138,7 @@ sub get_recordSource {
   #if (!$obj) { $m->not_found(); }; # form not found
   #my ($columns) = Sentosa::Objects::parse_object($obj);
 
-  my ($obj) = Sentosa::Objects::get_object($args->{id}, $args->{type}, $args->{userid});
+  my ($obj) = Sentosa::Objects::get_object_by_name($args->{app}, $args->{obj}, $args->{type}, $args->{userid});
   if (!$obj) { return; }
 
   my ($columns) = Sentosa::Objects::parse_object($obj);

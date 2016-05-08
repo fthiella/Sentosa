@@ -4,12 +4,14 @@ extends => undef;
 
 <%class>
   has '_id';
+  has '_app';
   has '_name';
 </%class>
 
 <%init>
   my ($obj, $columns) = Sentosa::Objects::get_recordSource({
-    id => $._id,
+    app => $._app,
+    obj => $._id,
     type => 'query',
     userid => $m->session->{auth_id}
   });

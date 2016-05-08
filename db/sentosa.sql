@@ -175,7 +175,7 @@ insert or replace into af_objects values
 '[
   {"box": "box1", "col": "TrackId",  "params": null, "caption": "TrackId",    "type": "text"},
   {"box": "box2", "col": "Name",     "params": null, "caption": "Track Name", "type": "text"},
-  {"box": "box2", "col": "AlbumId",  "params": null, "caption": "Album",      "type": "text",   "searchcriteria": "=", "link": "form/6", "link-id": "2"}
+  {"box": "box2", "col": "AlbumId",  "params": null, "caption": "Album",      "type": "text",   "searchcriteria": "=", "link": "form/Album", "link-id": "2"}
 ]'),
 
 (6, 2, 'form', 'Album', 2, 'Album', 'AlbumId', 'Albums Form',
@@ -183,12 +183,12 @@ insert or replace into af_objects values
   {"box": "box1", "col": "AlbumId", "params": null, "caption": "AlbumId", "type": "hidden"},
   {"box": "box2", "col": "Title", "params": null, "caption": "Album Title", "type": "text"},
   {"box": "box2", "col": "ArtistId", "params": null, "caption": "Artist", "type": "select2", "options": {"source": "Artist", "id": "ArtistId", "text": "Name"} },
-  {"box": "box3", "query": "5", "params": "q.AlbumId=f.AlbumId", "caption": "Tracks", "type": "query"}
+  {"box": "box3", "query": "Track", "params": "q.AlbumId=f.AlbumId", "caption": "Tracks", "type": "query"}
 ]'),
 
 (100, 3, 'query', 'Documents', 3, 'documents', 'id', 'User Documents',
 '[
   {"box": "box1", "col": "id",   "caption": "ID", "type": "hidden"},
-  {"box": "box2", "col": "name", "caption": "Filename", "type": "text", "link": "download/100", "link-id": "0"},
+  {"box": "box2", "col": "name", "caption": "Filename", "type": "text", "link": "download/Documents", "link-id": "0"},
   {"box": "box2", "col": "data", "caption": "data", "type": "blob"}
 ]');

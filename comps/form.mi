@@ -23,13 +23,15 @@ Example:
 </%doc>
 <%class>
   has '_id';
+  has '_app';
 	has '_record' => (default => '');
 </%class>
 <%init>
   use JSON ();
 
   my ($form, $columns) = Sentosa::Objects::get_recordSource({
-    id => $._id,
+    app => $._app,
+    obj => $._id,
     type => 'query',
     userid => $m->session->{auth_id}
   });
@@ -38,7 +40,8 @@ Example:
 <&
   form-widget.mi,
     form => {
-      id => $form->{id},
+      app => $._app,
+      id => $._id,
       description => $form->{description},
       record => $._record,
 	    pk => $form->{pk},

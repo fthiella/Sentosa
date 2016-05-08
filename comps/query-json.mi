@@ -4,15 +4,17 @@ extends => undef;
 
 <%class>
   has '_id';
+  has '_app';
   has '_col';
 </%class>
 
 <%init>
   my ($obj, $objcolumns) = Sentosa::Objects::get_recordSource({
-      id => $._id,
-      type => 'form',
-      userid => $m->session->{auth_id}
-    });
+    app => $._app,
+    obj => $._id,
+    type => 'form',
+    userid => $m->session->{auth_id}
+  });
   if (!$obj) { $m->not_found(); }; # form not found
 
   my ($opt) = map { $_->{options} } grep { ($_->{type} eq 'select2') && ($_->{col} eq $._col) } @{$objcolumns};

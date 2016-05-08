@@ -3,6 +3,7 @@ extends => undef;
 </%flags>
 <%class>
   has '_id';
+  has '_app';
 
   has 'iDisplayStart';
   has 'iDisplayLength';
@@ -14,10 +15,11 @@ extends => undef;
   # TODO: it is fun to code this component, but it's still not rock solid, maybe DBIx::Class could help much more? http://www.dbix-class.org/
 
   my ($obj, $columns) = Sentosa::Objects::get_recordSource({
-      id => $._id,
-      type => 'query',
-      userid => $m->session->{auth_id}
-    });
+    app => $._app,
+    obj => $._id,
+    type => 'query',
+    userid => $m->session->{auth_id}
+  });
   if (!$obj) { $m->not_found(); }; # form not found
 
   # add sSearch_nn to the columns data structure

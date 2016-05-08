@@ -115,7 +115,7 @@ sub selectQuery {
   my @sc = map {
     $C->{QUOTE} . $_->{col} . $C->{QUOTE}
   } grep {
-  	defined $_->{col}
+  	((defined $_->{col}) && ($_->{type} ne "blob"))
   } @{$args->{columns}};
 
   # Filter: filter table (for example by username)

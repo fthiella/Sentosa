@@ -6,6 +6,7 @@ extends => undef
 </%flags>
 <%class>
   has '_id'; # id of the object
+  has '_app';
   has 'button';
 </%class>
 <%init>
@@ -14,7 +15,8 @@ extends => undef
   use JSON ();
 
   my ($obj, $columns) = Sentosa::Objects::get_recordSource({
-    id => $._id,
+    app => $._app,
+    obj => $._id,
     type => 'form',
     userid => $m->session->{auth_id}
   });

@@ -9,8 +9,8 @@
   my @sidebar;
 
   my @apps = map { {url => '/' . $_->{url} . '/', title => $_->{details}} } Sentosa::Users::get_appsuserinfo($m->session->{auth_id});
-  my @queries = map { {url=> '/'. $._app . '/query/'.$_->{id}, title=>$_->{description}} } Sentosa::Objects::get_objectlist($m->session->{auth_id}, 'query', $._app);
-  my @forms = map { {url=> '/' . $._app . '/form/'.$_->{id}, title=>$_->{description}} } Sentosa::Objects::get_objectlist($m->session->{auth_id}, 'form', $._app);
+  my @queries = map { {url=> '/'. $._app . '/query/'.$_->{name}, title=>$_->{description}} } Sentosa::Objects::get_objectlist($m->session->{auth_id}, 'query', $._app);
+  my @forms = map { {url=> '/' . $._app . '/form/'.$_->{name}, title=>$_->{description}} } Sentosa::Objects::get_objectlist($m->session->{auth_id}, 'form', $._app);
 
   if (!defined $._app) {
     # Applications

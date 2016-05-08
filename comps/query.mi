@@ -14,7 +14,8 @@
   #my $columns = JSON->new->utf8->decode($obj->{def});
 
   my ($obj, $columns) = Sentosa::Objects::get_recordSource({
-    id => $._id,
+    app => $._app,
+    obj => $._id,
     type => 'query',
     userid => $m->session->{auth_id}
   });
@@ -29,7 +30,7 @@
 <table id="<% $._id %>" class="table table-nomargin dataTable-custom table-bordered dataTable-scroller" data-ajax-source="../query-data/<% $._id %>">
 <thead>
   <tr>
-% foreach my $col (map { $_->{caption} } @{$columns}) {
+% foreach my $col (map { $_->{caption} } grep {((defined $_->{col}) && ($_->{type} ne "blob")) } @{$columns}) {
     <th><% $col %></th>
 % }
   </tr>
@@ -41,7 +42,7 @@
   </tbody>
 <tfoot>
   <tr>
-% foreach my $col (@{$columns}) {
+% foreach my $col (grep {((defined $_->{col}) && ($_->{type} ne "blob"))} @{$columns}) {
 %   my $data_link;
 %   if (($.table_link) && ($col->{col} eq $.table_link->{to_field})) {
 %     $data_link = 'data-from-form="'. $.table_link->{from_form} .'" data-from-field="'. $.table_link->{from_field} .'"';
