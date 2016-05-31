@@ -26,6 +26,7 @@ create table if not exists af_users (
 );
 
 insert or replace into af_users (id, username, userdesc, password) values
+(0, 'guest', 'Guest', 'no_password'),
 (1, 'admin', 'Administrator', 'password'),
 (2, 'user',  'User',          'password');
 
@@ -51,6 +52,7 @@ create table if not exists af_groups (
 );
 
 insert or replace into af_groups (id, groupname) values
+(0, 'guests'),
 (1, 'administrators'),
 (2, 'samples');
 
@@ -65,6 +67,7 @@ create table if not exists af_usergroups (
 );
 
 insert or replace into af_usergroups (id_user, id_group) values
+(0, 0),
 ((select id from af_users where username='admin'), (select id from af_groups where groupname='administrators')),
 ((select id from af_users where username='user'),  (select id from af_groups where groupname='samples'));
 

@@ -11,7 +11,7 @@ B<Sentosa::Users> - routines for user authentication, and users and groups manag
 =cut
 
 sub get_userinfo {
-  my ($id) = @_;
+  my $id = shift // 0;
   
   my $ar = $dbh->selectrow_hashref(
     "SELECT id, username, userdesc
@@ -25,7 +25,8 @@ sub get_userinfo {
 }
 
 sub get_userproperty {
-  my ($id, $property) = @_;
+  my $id = shift // 0;
+  my $property = shift;
   
   my $ar = $dbh->selectrow_hashref(
     "SELECT value
@@ -39,7 +40,7 @@ sub get_userproperty {
 }
 
 sub get_groupsuserinfo {
-  my ($id) = @_;
+  my $id = shift // 0;
   
   my $ar = $dbh->selectall_arrayref(
     "SELECT g.id, g.groupname
@@ -55,7 +56,7 @@ sub get_groupsuserinfo {
 }
 
 sub get_appsuserinfo {
-  my ($id) = @_;
+  my $id = shift // 0;
   
   my $ar = $dbh->selectall_arrayref(
     "SELECT a.id, a.url, a.details
@@ -76,8 +77,9 @@ sub get_appsuserinfo {
 }
 
 sub get_appinfo {
-  my ($id, $app) = @_;
-  
+  my $id = shift // 0;
+  my $app = shift;
+
   my $ar = $dbh->selectrow_hashref(
     "SELECT a.id, a.url, a.details, a.cover, a.image
     FROM
@@ -98,11 +100,13 @@ sub get_appinfo {
 }
 
 sub auth_user {
-  my ($u, $p) = @_;
+  my $u = shift;
+  my $p = shift;
+
   my $ar = $dbh->selectall_arrayref(
     "SELECT id, username, password
     FROM af_users
-    WHERE username=? AND password=?",
+    WHERE id>0 and username=? AND password=?",
     {Slice => {}},
     $u,
     $p

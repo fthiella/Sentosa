@@ -1,6 +1,7 @@
 <%class>
 has '_title';
 has '_app';
+has '_user';
 </%class>
 
 <%augment wrap><!DOCTYPE html>
@@ -34,7 +35,9 @@ has '_app';
               <& widgets/dropdown-tasks.mc &>
               <& widgets/dropdown-messages.mc &>
               <& widgets/dropdown-alerts.mc &>
-              <& widgets/dropdown-user.mi &>
+% $.Defer {{
+              <& widgets/dropdown-user.mi, user=>Sentosa::Users::get_userinfo($m->session->{auth_id}) &>
+% }}
             </ul>
             <& /widgets/sidebar.mc, _app => $._app &>
 

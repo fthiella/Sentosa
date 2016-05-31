@@ -8,7 +8,9 @@ use JSON ();
 
 sub get_object {
   # TODO: I decided to ignore type, since a query can became a form, and a form can became a query, but I'm still undecided if this is a good idea or not :)
-  my ($id, $objecttype, $userid) = @_;
+  my $id = shift;
+  my $objecttype = shift;
+  my $userid = shift // 0;
 
   my $ar = $dbh->selectall_arrayref(
     "SELECT o.id, o.name, o.source, o.description, o.def, o.pk, c.db, c.username, c.password
@@ -42,7 +44,10 @@ sub get_object {
 
 sub get_object_by_name {
   # TODO: I decided to ignore type, since a query can became a form, and a form can became a query, but I'm still undecided if this is a good idea or not :)
-  my ($idapp, $name, $objecttype, $userid) = @_;
+  my $idapp = shift;
+  my $name = shift;
+  my $objecttype = shift;
+  my $userid = shift // 0;
 
   my $ar = $dbh->selectall_arrayref(
     "SELECT o.id, o.name, o.source, o.description, o.def, o.pk, c.db, c.username, c.password
@@ -77,7 +82,10 @@ sub get_object_by_name {
 
 sub get_objectlist {
   # TODO: return only objects per app, add id_app parameter
-  my ($userid, $objecttype, $app) = @_;
+  my $userid = shift // 0;
+  my $objecttype = shift;
+  my $app = shift;
+
   my $ar = $dbh->selectall_arrayref(
     "SELECT o.id, o.name, o.source, o.description, a.url, a.details
     FROM af_objects o INNER JOIN af_apps a ON o.id_app=a.id
@@ -109,7 +117,7 @@ sub get_objectlist {
 }
 
 sub parse_object {
-  my ($obj) = @_;
+  my $obj = shift;
 
   # array of hashes @{$columns} one hash for each column
   my $columns = JSON->new->utf8->decode($obj->{def});
@@ -132,7 +140,7 @@ sub parse_object {
 }
 
 sub get_recordSource {
-  my ($args) = @_;
+  my $args = shift;
 
   #my ($obj) = Sentosa::Objects::get_object($._id, 'query', $m->session->{auth_id});
   #if (!$obj) { $m->not_found(); }; # form not found

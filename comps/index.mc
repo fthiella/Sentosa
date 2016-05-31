@@ -4,8 +4,9 @@
   $._title(Sentosa::Utils::get_sentosainfo);
 
   my $user = Sentosa::Users::get_userinfo($m->session->{auth_id});
+  $._user($user);
 </%init>
-% if ($user) {
+
 <h1>Welcome, <% $user->{userdesc} %></h1>
 <p>
 <img src="/static/images/home.jpg">
@@ -28,7 +29,7 @@ Your apps are:
 % }
 </ul>
 </p>
-% } else {
+% if ((!$user) || ($user->{id} == 0)) {
 <p>
 You are logged in as <strong>Guest</strong>. Please <a href="login">go to login page</a>!
 </p>
