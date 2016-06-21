@@ -6,9 +6,9 @@ Sentosa AutoForms aims to provide a web interface for databases, with forms, sub
 
 ## Getting Started
 
-August 2015: It's still very early in development. Please come back soon, I have some code but not much to show now. Some basic interface will be ready around half of September 2015.
+Even if still in developement and with some features missing, I'm using Sentosa within my team and within my company already. This is how to prepare the server.
 
-Install cpanminus:
+Make sure cpanminus is installed:
 
     yum install cpanminus
 
@@ -18,16 +18,17 @@ Install CPAN modules:
     cpanm DBD::SQLite
     cpanm Log::Log4perl
     cpanm Log::Any::Adapter::Log4perl
+    cpanm Mason::Plugin::WithEncoding
 
-Make sure that sqlite3 is installed then prepare local db:
+Prepare the local db:
 
-    bin/install_db.sh
+    bin/install_db
 
 Run Poet in development mode:
 
     bin/run.pl
 
-Open with your browser:
+Open it inside your browser:
 
     http://localhost:5000
 
