@@ -9,12 +9,12 @@ then
 fi
 
 echo "Importing sentosa.sql ..."
-sqlite3 -batch data/sentosa.db < db/sentosa.sql
+perl bin/sqlbuild.pl -s db/sentosa.sql
 
 if [ -f db/sentosa.custom.sql ];
 then
   echo "Importing sentosa.custom.sql ..."
-  sqlite3 -batch data/sentosa.db < db/sentosa.custom.sql
+  perl bin/sqlbuild.pl db/sentosa.custom.sql
 fi
 
 if [ -f data/chinook.db ];
