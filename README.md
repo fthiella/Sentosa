@@ -11,7 +11,7 @@ Even if still in developement and with some features missing, I'm using Sentosa 
 
 You will need perl:
 
-   yum insall perl
+    yum insall perl
 
 Also make sure cpanminus is installed:
 
