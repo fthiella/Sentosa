@@ -1,6 +1,7 @@
 # [Sentosa AutoForms](http://learningmason.wordpress.com/)
 
 Sentosa AutoForms aims to provide a web interface for databases, with forms, subforms, tables and reports, etc.
+It is written in Perl and [Mason](http://www.masonhq.com).
 
 ![Sentosa Demo](https://raw.githubusercontent.com/fthiella/Sentosa/518976bc23023f955fc537ad48dfd325e01af40f/Sentosa.gif)
 
@@ -8,7 +9,11 @@ Sentosa AutoForms aims to provide a web interface for databases, with forms, sub
 
 Even if still in developement and with some features missing, I'm using Sentosa within my team and within my company already. This is how to prepare the server.
 
-Make sure cpanminus is installed:
+You will need perl:
+
+   yum insall perl
+
+Also make sure cpanminus is installed:
 
     yum install cpanminus
 
