@@ -154,7 +154,7 @@ sub get_recordSource {
   # Add filter from properties
 
   foreach my $l (@{$columns}) {
-    if ($l->{filter} =~ /^\{(.*)\}$/) {
+    if (defined($l->{filter}) && ($l->{filter} =~ /^\{(.*)\}$/)) {
       $l->{filter}=Sentosa::Users::get_userproperty($args->{userid}, $1);
     };
   }

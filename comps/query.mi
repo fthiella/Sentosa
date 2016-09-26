@@ -1,3 +1,6 @@
+<%doc>
+Creates a hash that defines a query (Datatable), then calls query-widget.mi
+</%doc>
 <%class>
   has '_id';
   has 'table_link';
@@ -24,37 +27,19 @@
   # TODO: always quote all identifiers, on every component not just here ^_^
   my @fields = map { $_->{col} } @{$columns};
 </%init>
-% if ($.hide_title eq '0') {
-<h1><% $obj->{description} %></h1>
-% }
-<table id="<% $._id %>" class="table table-nomargin dataTable-custom table-bordered dataTable-scroller" data-ajax-source="../query-data/<% $._id %>">
-<thead>
-  <tr>
-% foreach my $col (map { $_->{caption} } grep {((defined $_->{col}) && ($_->{type} ne "blob")) } @{$columns}) {
-    <th><% $col %></th>
-% }
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td colspan="<% scalar @{$columns} %>" class="dataTables_empty">Loading data from server</td>
-  </tr>
-  </tbody>
-<tfoot>
-  <tr>
-% foreach my $col (grep {((defined $_->{col}) && ($_->{type} ne "blob"))} @{$columns}) {
-%   my $data_link;
-%   if (($.table_link) && ($col->{col} eq $.table_link->{to_field})) {
-%     $data_link = 'data-from-form="'. $.table_link->{from_form} .'" data-from-field="'. $.table_link->{from_field} .'"';
-%   } else {
-%     $data_link = "";
-%   }
-%   if ( $.hide_bottom eq '0' ) {
-    <th><input type="<% $col->{type} %>" name="<% $._id %>_search_<% $col->{col} %>" value="<% $col->{col} %>" data-value="<% $col->{col} %>" <% $data_link %> class="search_init" data-link="<% $col->{link} %>" data-link-id="<% $col->{'link-id'} %>" /></th>
-%   } else {
-    <th><input type="hidden" name="<% $._id %>_search_<% $col->{col} %>" value="<% $col->{col} %>" data-value="<% $col->{col} %>" <% $data_link %> class="search_init" data-link="<% $col->{link} %>" data-link-id="<% $col->{'link-id'} %>" /></th>
-%   }
-% }
-  </tr>
-</tfoot>
-</table>
+<&
+  query-widget.mi,
+    query => {
+      app => $._app,
+      id => $._id,
+      description => $obj->{description},
+      pk => $obj->{pk},
+      columns => $columns,
+      params => {
+        'table_link'  => $.table_link,
+        'hide_title'  => $.hide_title,
+        'hide_top'    => $.hide_top,
+        'hide_bottom' => $.hide_bottom
+      }
+    }
+&>

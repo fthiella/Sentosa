@@ -66,7 +66,7 @@ sub limitFilter {
   my ($start, $length, $dbms) = @_;
 
   return (
-    (sprintf $DBMS_MAP->{$dbms}->{TOP} // '', $start, $length, $start + $length),
+    (sprintf $DBMS_MAP->{$dbms}->{TOP} // '', $start, $length, ($start // 0) + ($length // 0)),
     (sprintf $DBMS_MAP->{$dbms}->{LIMIT} // '', $start // 0, $length // 99, ($start // 0) + ($length // 99))
   );
 }

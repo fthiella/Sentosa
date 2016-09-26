@@ -1,5 +1,5 @@
 <%doc>
-Creates a hash that defines the form, then calls form.mi
+Creates a hash that defines the form, then calls form-widget.mi
 
 Example:
 
