@@ -1,0 +1,75 @@
+<%flags>
+extends => undef;
+</%flags>
+<%class>
+  has 'obj';
+  has 'columns';
+
+  has 'iDisplayStart';
+  has 'iDisplayLength';
+  has 'iColumns';
+
+  has 'sEcho';
+
+  has 'searchArgs';
+</%class>
+<%init>
+  # add sSearch_nn to the columns data structure
+
+  foreach (grep {/^sSearch_\d+/} keys $.searchArgs) {
+    if ($.searchArgs->{$_} ne "") {
+      # add filter to the column
+      /sSearch_(\d+)/;
+      ${$.columns}[ $1 ]{search} = $.searchArgs->{$_};
+    }
+  }
+
+  my $h = DBI->connect($.obj->{db}, $.obj->{username}, $.obj->{password}) or die("connection to ".$.obj->{db}." error.\n");
+  $h->{sqlite_unicode} = 1;
+  $h->{mysql_enable_utf8} = 1;
+
+  my $q = Sentosa::SQL::selectQuery({
+    source => $.obj->{source},
+    columns => $.columns,
+    order => 'ASC',
+    goto => {},
+    start => $.iDisplayStart,
+    length => $.iDisplayLength,
+    dbms => $h->{Driver}->{Name}
+  });
+
+#  #################################################################
+  
+  my $query          = $q->{'query'};
+  my $query_filt     = $q->{'query_search'};
+  my $query_limit    = $q->{'query_limit'};
+
+  my $query_cnt_all  = "SELECT COUNT(*) AS nrows FROM ($query) q\n";
+  my $query_cnt_filt = "SELECT COUNT(*) AS nrows FROM ($query_filt) q\n";
+
+  #### get number of unfiltered rows ####
+
+  # get number of total rows, and number of total filtered rows
+  my ($iTotalRecords) = $h->selectrow_array($query_cnt_all, undef, @{$q->{'query_data'}});
+  my ($iTotalDisplayRecords) = $h->selectrow_array($query_cnt_filt, undef, @{$q->{'query_search_data'}});
+</%init>
+<%perl>
+  #### get rows ####
+  my $rows = $h->selectall_arrayref($query_limit, undef, @{$q->{'query_limit_data'}});
+
+  my %src = (
+    sEcho => $.sEcho,
+    iTotalRecords => $iTotalRecords,
+    iTotalDisplayRecords => $iTotalDisplayRecords,
+    aaData => $rows
+  );
+
+  # $m->send_json( \%src );
+  #$m->clear_buffer;
+  # $m->print(JSON::XS::encode_json(\%j));
+  #$m->print(JSON::XS->new->encode(\%src));
+  #$m->res->content_type("application/json");
+  #$m->abort();
+
+  $m->send_json( \%src );
+</%perl>
