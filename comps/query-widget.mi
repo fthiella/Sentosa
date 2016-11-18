@@ -4,7 +4,7 @@
 % if ($.query->{params}->{'hide_title'} eq '0') {
 <h1><% $.query->{description} %></h1>
 % }
-<table id="<% $.query->{id} %>" class="table table-nomargin dataTable-custom table-bordered dataTable-scroller" data-ajax-source="../query-data/<% $.query->{id} %>">
+<table id="<% $.query->{id} %>" class="table table-nomargin dataTable-custom table-bordered dataTable-scroller" data-ajax-source="<% $.query->{json} %>" width="0">
 <thead>
   <tr>
 % foreach my $col (map { $_->{caption} } grep {((defined $_->{col}) && ($_->{type} ne "blob")) } @{$.query->{columns}}) {
@@ -18,7 +18,8 @@
   </tr>
   </tbody>
 <tfoot>
-  <tr>
+% # I just hide, otherwise there might be some problem with hidden search parameters TODO: make it better
+  <tr <% ($.query->{params}->{'hide_bottom'} eq '1' ) ? (' style="display: none;"') : '' %> >
 % foreach my $col (grep {((defined $_->{col}) && ($_->{type} ne "blob"))} @{$.query->{columns}}) {
 %   my $data_link;
 %   if (($.query->{params}->{'table_link'}) && ($col->{col} eq $.query->{params}->{'table_link'}->{to_field})) {
@@ -26,11 +27,7 @@
 %   } else {
 %     $data_link = "";
 %   }
-%   if ( $.query->{params}->{'hide_bottom'} eq '0' ) {
     <th><input type="<% $col->{type} %>" name="<% $.query->{id} %>_search_<% $col->{col} %>" value="<% $col->{col} %>" data-value="<% $col->{col} %>" <% $data_link %> class="search_init" data-link="<% $col->{link} %>" data-link-id="<% $col->{'link-id'} %>" /></th>
-%   } else {
-    <th><input type="hidden" name="<%  $.query->{id} %>_search_<% $col->{col} %>" value="<% $col->{col} %>" data-value="<% $col->{col} %>" <% $data_link %> class="search_init" data-link="<% $col->{link} %>" data-link-id="<% $col->{'link-id'} %>" /></th>
-%   }
 % }
   </tr>
 </tfoot>

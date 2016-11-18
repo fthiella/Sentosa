@@ -126,6 +126,22 @@ $(document).ready(function() {
 
     /* NEW FUNCTIONS */
 
+    function init_tile(tile) {
+        $.getJSON( tile.attr("data-ajax-source"), function( data ) {
+            // create an hash from the json aaData
+            var a = data["aaData"];
+            var h = {};
+            for (var i=0; i< a.length; i++) {
+                h[ a[i][0] ] = a[i][1];
+            };
+            // loop through all elements, and set data from the hash
+            // (yes, I could directly read aaData and put it inside the html... but I also want to put - where data is not avaliable, so I have to use an hash first)
+            $("li", tile).each(function () {
+                $('span.count', this).text(h[$(this).attr("data-value")] || '-');
+            });
+        });
+    }
+
     function init_table(table) {
         var aoColumnDefs = [];
 
@@ -133,7 +149,11 @@ $(document).ready(function() {
 
             var f = function (data, type, row) {
                     if (this.attr('data-link')) {
+                        /* internal link, data-link is a link inside sentosa */
                         return '<a href="../' + this.attr('data-link') + '?_record='+ row[this.attr('data-link-id')] +'"">' + data + '</a>';
+                    } else if (this.attr('data-link-id')) {
+                        /* direct link only, taken from field data-link-id */
+                        return '<a href="' + row[this.attr('data-link-id')] + '" target="_blank">' + data + '</a>';
                     } else {
                         return data;
                     }
@@ -153,6 +173,14 @@ $(document).ready(function() {
                 "sAjaxSource": table.attr("data-ajax-source"),
                 "aoColumnDefs": aoColumnDefs,
 
+                /* TODO: should use sDom ... but this is simpler at the moment */
+                "bPaginate": true,
+                "bLengthChange": false,
+                "bFilter": true,
+                "bInfo": false,
+                "bAutoWidth": false,
+                "bSearch": false,
+
                 "oLanguage": {
                     "sLengthMenu":   "Mostra _MENU_ righe per pagina",
                     "sZeroRecords":  "Nessun risultato",
@@ -162,6 +190,7 @@ $(document).ready(function() {
                     "sSearch":       "Cerca:"
                 }
             });
+
         // console.dir(aoColumnDefs);
 
         /* SYNC: links form fields to table fields. Use a plugin like fieldsyc? */
@@ -202,6 +231,28 @@ $(document).ready(function() {
     $('table[data-ajax-source]').each(function () {
         init_table($(this));
     });
+
+    /* initialize all ul tiles */
+    $('ul[data-ajax-source]').each(function () {
+        init_tile($(this));
+    });
+
+    /* automatically refresh tables every 30 sec */
+    /* TODO: I commented this part because I want to control individualli which tables and tiles have to be refreshed
+    setInterval (function autoRefresh() {
+        // refresh all tables TODO: add filter to refresh only selected tables
+        $('table[data-ajax-source]').each(function () {
+            console.log("Processing");
+            var table = $(this).DataTable();
+            table.ajax.reload();
+        });
+
+        // refresh all tiles
+        $('ul[data-ajax-source]').each(function () {
+            init_tile($(this));
+        });
+    }, 30000);
+    */
 
     /* initialize all selects */
     /* https://github.com/select2/select2/issues/3116#issuecomment-102119431 */

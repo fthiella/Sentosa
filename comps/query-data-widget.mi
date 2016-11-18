@@ -14,14 +14,42 @@ extends => undef;
   has 'searchArgs';
 </%class>
 <%init>
+  use DBI;
+  use Sentosa::SQL;
+  use Clone 'clone';
+
+  # TODO: I think I made some confusion between hash_ref/array_ref and hash/array ... same as this question:
+  # http://stackoverflow.com/questions/7083453/copying-a-hashref-in-perl
+  # using clone ... should I use it on the Base.mp component instead of here?
+  # (the problem: whenever I add a filter to a column, i switch to other page, then i go back to the original page the filter is still there
+  # - that's because $.columns is a hash reference, therefore the original $recordset variable is updated also...)
+  my $local_columns = clone($.columns);
+
+
   # add sSearch_nn to the columns data structure
 
   foreach (grep {/^sSearch_\d+/} keys $.searchArgs) {
     if ($.searchArgs->{$_} ne "") {
       # add filter to the column
       /sSearch_(\d+)/;
-      ${$.columns}[ $1 ]{search} = $.searchArgs->{$_};
+      ${$local_columns}[ $1 ]{search} = $.searchArgs->{$_};
     }
+  }
+
+  # add iSortCol_ to the columns data structure
+  # TODO: this might be in conflict with existing order columns, should datatables be shown accordingly to those order, then let the user decide to change that order?
+  for my $n (0..($.searchArgs->{'iSortingCols'}-1)) {
+    my $column_number = $.searchArgs->{"iSortCol_$n"};
+
+    # default is ASC, don't trust user input and set it to either ASC or DESC
+    my $column_sort_direction = 'ASC';
+    if ($.searchArgs->{"sSortDir_$n"} =~ /asc/i) {
+      $column_sort_direction = 'ASC';
+    } elsif ($.searchArgs->{"sSortDir_$n"} =~ /desc/i) {
+      $column_sort_direction = 'DESC';
+    }
+
+    ${$local_columns}[ $column_number ]{order} = $column_sort_direction;
   }
 
   my $h = DBI->connect($.obj->{db}, $.obj->{username}, $.obj->{password}) or die("connection to ".$.obj->{db}." error.\n");
@@ -30,7 +58,7 @@ extends => undef;
 
   my $q = Sentosa::SQL::selectQuery({
     source => $.obj->{source},
-    columns => $.columns,
+    columns => $local_columns,
     order => 'ASC',
     goto => {},
     start => $.iDisplayStart,
@@ -52,6 +80,7 @@ extends => undef;
   # get number of total rows, and number of total filtered rows
   my ($iTotalRecords) = $h->selectrow_array($query_cnt_all, undef, @{$q->{'query_data'}});
   my ($iTotalDisplayRecords) = $h->selectrow_array($query_cnt_filt, undef, @{$q->{'query_search_data'}});
+
 </%init>
 <%perl>
   #### get rows ####
